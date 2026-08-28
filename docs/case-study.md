@@ -38,6 +38,8 @@ Critical browser flows create and mutate data, so running them against the norma
 
 ## Product views
 
+![English ServiceOps workflow demo](screenshots/serviceops-demo.gif)
+
 | Customer booking                                                            | Owner dashboard                                                                |
 | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 | ![English mobile customer booking](screenshots/customer-booking-mobile.png) | ![English owner operations dashboard](screenshots/owner-dashboard-desktop.png) |
@@ -46,7 +48,7 @@ Critical browser flows create and mutate data, so running them against the norma
 | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | ![English owner booking calendar](screenshots/owner-calendar-desktop.png) | ![English mobile staff assigned work](screenshots/staff-bookings-mobile.png) |
 
-The screenshots are generated from deterministic fictional seed data with `make portfolio-captures`.
+The screenshots are generated from deterministic fictional seed data with `make portfolio-captures`. The short workflow GIF is generated with `make portfolio-demo` and requires ImageMagick.
 
 ## Testing strategy
 

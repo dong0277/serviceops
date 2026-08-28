@@ -7,6 +7,7 @@
     "build": "next build",
     "build:webpack": "next build --webpack",
     "start": "next start",
+    "capture:demo": "node scripts/capture-demo.mjs",
     "capture:portfolio": "node scripts/capture-portfolio.mjs",
     "e2e": "playwright test",
     "lint": "eslint .",

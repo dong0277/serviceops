@@ -1217,6 +1217,8 @@ Portfolio progress record (2026-08-28): added a reproducible `make portfolio-cap
 
 Touch-target review record (2026-08-28): measured every visible interactive element across the full 390 × 844 customer booking, staff assigned-work, and owner dashboard pages. The shared language selector and four compact text links measured 16–20 CSS pixels high; their hit areas now measure 40–44 pixels. A Playwright regression guard rejects representative visible interactive targets smaller than 24 CSS pixels, and all 12 isolated accessibility and critical-flow tests pass. `docs/manual-accessibility-review.md` now provides route-by-route VoiceOver, second-screen-reader, physical-device, findings, and retest procedures. Human auditory review and physical-device ergonomics confirmation, deployment approval, and the release tag remain open.
 
+Demo capture record (2026-08-28): added a reproducible `make portfolio-demo` workflow that uses the isolated fictional seed environment to capture an English customer request, staff confirmation, owner dashboard, and booking calendar sequence. The optimized looping GIF is embedded in the README and case study; ImageMagick is the only additional local capture dependency. Human accessibility review, deployment approval, and the release tag remain open.
+
 ## 23. Acceptance Criteria
 
 The MVP is complete only when all of these are true:

@@ -1,6 +1,6 @@
 SHELL := /bin/sh
 
-.PHONY: setup install start stop logs dev-web dev-api lint format type-check test e2e portfolio-captures build migrate seed
+.PHONY: setup install start stop logs dev-web dev-api lint format type-check test e2e portfolio-captures portfolio-demo build migrate seed
 
 setup:
 	@test -f .env || cp .env.example .env
@@ -80,6 +80,22 @@ portfolio-captures:
 	docker compose -p "$$project" up --build -d --wait; \
 	docker compose -p "$$project" exec -T api /app/.venv/bin/python -m app.seed; \
 	PORTFOLIO_BASE_URL="http://127.0.0.1:$$web_port" pnpm --filter @serviceops/web capture:portfolio
+
+portfolio-demo:
+	@set -eu; \
+	command -v magick >/dev/null || { echo "ImageMagick is required (brew install imagemagick)."; exit 1; }; \
+	project=serviceops-portfolio-demo; \
+	web_port=$${PORTFOLIO_DEMO_WEB_PORT:-13020}; \
+	api_port=$${PORTFOLIO_DEMO_API_PORT:-18020}; \
+	postgres_port=$${PORTFOLIO_DEMO_POSTGRES_PORT:-15450}; \
+	cleanup() { docker compose -p "$$project" down -v --remove-orphans >/dev/null; }; \
+	trap cleanup EXIT HUP INT TERM; \
+	export WEB_PORT="$$web_port" API_PORT="$$api_port" POSTGRES_PORT="$$postgres_port"; \
+	export CORS_ALLOWED_ORIGINS="http://127.0.0.1:$$web_port,http://127.0.0.1:$$api_port"; \
+	export NEXT_PUBLIC_API_BASE_URL="http://127.0.0.1:$$api_port"; \
+	docker compose -p "$$project" up --build -d --wait; \
+	docker compose -p "$$project" exec -T api /app/.venv/bin/python -m app.seed; \
+	PORTFOLIO_BASE_URL="http://127.0.0.1:$$web_port" pnpm --filter @serviceops/web capture:demo
 
 build:
 	pnpm build

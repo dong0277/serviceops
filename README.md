@@ -22,6 +22,8 @@ All displayed names, email addresses, schedules, metrics, and prices are fiction
 
 ## Product views
 
+![English ServiceOps workflow demo](docs/screenshots/serviceops-demo.gif)
+
 | Customer booking                                                                 | Owner operations                                                                    |
 | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
 | ![English mobile customer booking](docs/screenshots/customer-booking-mobile.png) | ![English owner operations dashboard](docs/screenshots/owner-dashboard-desktop.png) |

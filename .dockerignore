@@ -11,8 +11,8 @@
 **/.next
 **/.venv
 **/node_modules
+apps/web/scripts
 coverage
 node_modules
 playwright-report
 test-results
-
