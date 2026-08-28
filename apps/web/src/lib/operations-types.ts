@@ -25,6 +25,20 @@ export type OwnerBookingRecord = BookingRecord & {
   customer_email: string;
 };
 
+export type OwnerBookingSort = "starts_at_desc" | "starts_at_asc";
+
+export type OwnerBookingPageRecord = {
+  items: OwnerBookingRecord[];
+  total: number;
+  limit: number;
+  offset: number;
+  summary: {
+    today_count: number;
+    requested_count: number;
+    upcoming_count: number;
+  };
+};
+
 export type StaffBookingRecord = BookingRecord & {
   customer_display_name: string;
 };

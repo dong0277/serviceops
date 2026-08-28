@@ -180,11 +180,29 @@ Requires an owner membership. The optional `period_days` query parameter accepts
 
 ### `GET /api/v1/organizations/{organization_slug}/owner/bookings`
 
-Requires an owner membership and returns organization bookings with customer, service, and staff summaries. Optional filters are `status`, `service_id`, `staff_profile_id`, `date_from`, and `date_to`. Date boundaries are interpreted in the organization timezone.
+Requires an owner membership and returns organization bookings with customer, service, and staff summaries. Optional filters are `status`, `service_id`, `staff_profile_id`, `date_from`, and `date_to`; `query` searches stored customer names and emails, service names, staff names, and booking IDs. Date boundaries are interpreted in the organization timezone.
+
+`sort` accepts `starts_at_desc` (the default) or `starts_at_asc`. `limit` defaults to 10 and accepts 1–100; `offset` defaults to 0 and must be non-negative. The response uses this stable envelope:
+
+```json
+{
+  "items": [],
+  "total": 0,
+  "limit": 10,
+  "offset": 0,
+  "summary": {
+    "today_count": 0,
+    "requested_count": 0,
+    "upcoming_count": 0
+  }
+}
+```
+
+`total` reflects the active search and filters. `summary` remains organization-wide so the booking highlight cards do not change while paging or filtering. Clients that need an entire bounded interval, such as the owner calendar, must request successive pages until all `total` rows are collected.
 
 Additional owner operations:
 
-- `GET /api/v1/organizations/{organization_slug}/owner/bookings/export` returns the filtered CSV and records the export request.
+- `GET /api/v1/organizations/{organization_slug}/owner/bookings/export` returns a CSV using the same filters, search, and sort order, then records the export request.
 - `GET|PATCH /api/v1/organizations/{organization_slug}/owner/bookings/{booking_id}` reads or updates assignment and internal note details.
 - `PATCH /api/v1/organizations/{organization_slug}/owner/bookings/{booking_id}/status` applies a valid status transition.
 - `GET /api/v1/organizations/{organization_slug}/owner/customers` lists customer activity summaries.
@@ -221,4 +239,4 @@ Booking, service, staff, assignment, status, cancellation, internal-note, and CS
 - `422 validation_error` — one or more request fields are invalid
 - `429 login_rate_limited` — failed-login window exceeded
 
-The error and validation envelopes are part of the API contract. Audit logs expose bounded `limit` and `offset` parameters, but owner booking results do not yet expose pagination and shared client-selectable sorting. That gap must be implemented or explicitly deferred before the MVP release tag.
+The error and validation envelopes are part of the API contract. Audit logs and owner booking results expose bounded `limit` and `offset` parameters; owner bookings additionally expose shared server-side search, filtering, and client-selectable schedule sorting.

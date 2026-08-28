@@ -97,6 +97,8 @@ test.describe.serial("ServiceOps critical role flows", () => {
     await page.goto("/en/owner/bookings");
     await page.getByLabel("Status").selectOption("requested");
     await expect(page.locator("tbody").getByText("Requested", {exact: true}).first()).toBeVisible();
+    await page.getByLabel("Sort bookings").selectOption("starts_at_asc");
+    await expect(page.getByText(/Page 1 of \d+/)).toBeVisible();
   });
 
   test("owner milestone pages remain responsive and localized in English", async ({page}) => {

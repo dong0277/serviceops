@@ -52,7 +52,7 @@ The English screenshots are generated from deterministic fictional seed data wit
 
 ## Testing strategy
 
-Backend integration tests cover authentication, session rotation, CSRF, tenancy, role isolation, service operations, availability, cancellation and rescheduling, audit records, CSV sanitization, dashboard metrics, and near-concurrent booking attempts. Playwright covers the primary customer, staff, and owner journeys plus responsive English localization and authorization denial.
+Backend integration tests cover authentication, session rotation, CSRF, tenancy, role isolation, service operations, availability, cancellation and rescheduling, paginated owner search and sorting, audit records, CSV sanitization, dashboard metrics, and near-concurrent booking attempts. Playwright covers the primary customer, staff, and owner journeys plus responsive English localization and authorization denial.
 
 Automated axe checks target WCAG 2.0/2.1 A and AA rules across representative routes. Keyboard tests cover focus trapping, Escape dismissal, and focus restoration. Additional coverage checks 200%-equivalent reflow, reduced-motion behavior, forced colors, horizontal overflow, and representative touch-target geometry. VoiceOver, a second screen-reader/browser combination, and physical-device ergonomics remain release gates.
 
@@ -73,4 +73,4 @@ The MVP excludes payments, invoicing, payroll, accounting, chat, AI features, na
 
 ServiceOps now demonstrates a complete local workflow: deterministic setup, secure sessions, organization-scoped APIs, conflict-safe booking, responsive bilingual role surfaces, live operations reporting, auditability, and automated quality gates. A clean checkout has been verified independently of the original working directory.
 
-The next phase is a human assistive-technology and physical-device review, plus a decision to implement owner-booking pagination or explicitly defer it. An approved public deployment must revalidate cookie, CORS, CSRF, and same-site behavior against the final domains and replace or supplement the process-local login limiter before multi-instance operation. After the zero-cost topology and acceptance checklist are confirmed, the repository can receive its first MVP release tag.
+The next phase is a human assistive-technology and physical-device review. An approved public deployment must revalidate cookie, CORS, CSRF, and same-site behavior against the final domains and replace or supplement the process-local login limiter before multi-instance operation. After the zero-cost topology and acceptance checklist are confirmed, the repository can receive its first MVP release tag.

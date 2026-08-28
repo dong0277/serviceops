@@ -348,8 +348,93 @@ def test_reschedule_conflict_and_owner_internal_view(
     login_for_writes(client, "bookings.owner@serviceops.test")
     owner_list = client.get(f"/api/v1/organizations/{demo_organization.slug}/owner/bookings")
     assert owner_list.status_code == 200
-    owner_first = next(item for item in owner_list.json() if item["id"] == str(first.id))
+    owner_first = next(item for item in owner_list.json()["items"] if item["id"] == str(first.id))
     assert owner_first["internal_note"] == "고객에게 공개하면 안 되는 메모"
+
+
+def test_owner_booking_pagination_search_sort_and_summary(
+    client: TestClient,
+    db: Session,
+    demo_organization: Organization,
+) -> None:
+    starts_at = future_slot(days=11)
+    service, staff = create_domain(db, demo_organization, starts_at=starts_at)
+    customers = [
+        create_identity(
+            db,
+            demo_organization,
+            email=f"page.customer.{index}@serviceops.test",
+            role=MembershipRole.CUSTOMER,
+            display_name=f"페이지 고객 {index}",
+        )
+        for index in range(1, 4)
+    ]
+    create_identity(
+        db,
+        demo_organization,
+        email="page.owner@serviceops.test",
+        role=MembershipRole.OWNER,
+    )
+    bookings = [
+        Booking(
+            organization_id=demo_organization.id,
+            customer_user_id=customer.id,
+            staff_profile_id=staff.id,
+            service_id=service.id,
+            starts_at=starts_at + timedelta(hours=index * 2),
+            ends_at=starts_at + timedelta(hours=index * 2 + 1),
+            status=booking_status,
+        )
+        for index, (customer, booking_status) in enumerate(
+            zip(
+                customers,
+                [BookingStatus.REQUESTED, BookingStatus.CONFIRMED, BookingStatus.COMPLETED],
+                strict=True,
+            )
+        )
+    ]
+    db.add_all(bookings)
+    db.commit()
+
+    login_for_writes(client, "page.owner@serviceops.test")
+    path = f"/api/v1/organizations/{demo_organization.slug}/owner/bookings"
+    first_page = client.get(
+        path,
+        params={"limit": 2, "offset": 0, "sort": "starts_at_asc"},
+    )
+    assert first_page.status_code == 200
+    payload = first_page.json()
+    assert payload["total"] == 3
+    assert payload["limit"] == 2
+    assert payload["offset"] == 0
+    assert [item["id"] for item in payload["items"]] == [
+        str(bookings[0].id),
+        str(bookings[1].id),
+    ]
+    assert payload["summary"] == {
+        "today_count": 0,
+        "requested_count": 1,
+        "upcoming_count": 2,
+    }
+
+    second_page = client.get(
+        path,
+        params={"limit": 2, "offset": 2, "sort": "starts_at_asc"},
+    )
+    assert [item["id"] for item in second_page.json()["items"]] == [str(bookings[2].id)]
+
+    searched = client.get(path, params={"query": "페이지 고객 2"})
+    assert searched.status_code == 200
+    assert searched.json()["total"] == 1
+    assert searched.json()["items"][0]["id"] == str(bookings[1].id)
+
+    filtered = client.get(path, params={"status": "requested"})
+    assert filtered.status_code == 200
+    assert filtered.json()["total"] == 1
+    assert filtered.json()["items"][0]["id"] == str(bookings[0].id)
+
+    assert client.get(path, params={"limit": 0}).status_code == 422
+    assert client.get(path, params={"sort": "invalid"}).status_code == 422
 
 
 def test_database_exclusion_constraint_handles_concurrent_attempts(
@@ -664,7 +749,10 @@ def test_owner_customer_view_csv_sanitization_and_audit_log(
     customer_row = next(item for item in customers.json() if item["id"] == str(customer.id))
     assert customer_row["booking_count"] == 1
 
-    exported = client.get(f"{base}/bookings/export", params={"status": "requested"})
+    exported = client.get(
+        f"{base}/bookings/export",
+        params={"status": "requested", "query": "csv.customer"},
+    )
     assert exported.status_code == 200
     rows = list(csv.reader(io.StringIO(exported.text)))
     exported_row = next(row for row in rows[1:] if row[0] == str(booking.id))
@@ -674,7 +762,10 @@ def test_owner_customer_view_csv_sanitization_and_audit_log(
 
     audits = client.get(f"{base}/audit-logs", params={"action": "csv_export_requested"})
     assert audits.status_code == 200
-    assert audits.json()[0]["metadata_json"]["row_count"] >= 1
+    audit_metadata = audits.json()[0]["metadata_json"]
+    assert audit_metadata["row_count"] >= 1
+    assert audit_metadata["query_applied"] is True
+    assert "query" not in audit_metadata
 
 
 def test_owner_dashboard_metrics_are_real_and_organization_scoped(

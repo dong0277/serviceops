@@ -1,6 +1,8 @@
 "use client";
 
 import {
+  ChevronLeft,
+  ChevronRight,
   Download,
   LoaderCircle,
   LogIn,
@@ -12,7 +14,7 @@ import {
   X,
 } from "lucide-react";
 import {useLocale, useTranslations} from "next-intl";
-import {useCallback, useEffect, useMemo, useState} from "react";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
 import {Card} from "@/components/ui/card";
@@ -28,7 +30,10 @@ import {
   bookingStatusTone,
   nextBookingStatuses,
   type BookingStatus,
+  type OwnerBookingPageRecord,
   type OwnerBookingRecord,
+  type OwnerBookingSort,
+  type ServiceRecord,
   type StaffProfileRecord,
 } from "@/lib/operations-types";
 import {useModalFocus} from "@/lib/use-modal-focus";
@@ -37,16 +42,18 @@ type Status = BookingStatus;
 type BookingRecord = OwnerBookingRecord;
 
 const organizationSlug = "demo-services";
-function seoulDateKey(value: string | Date) {
-  const parts = new Intl.DateTimeFormat("en", {
-    timeZone: "Asia/Seoul",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(typeof value === "string" ? new Date(value) : value);
-  const part = (type: Intl.DateTimeFormatPartTypes) =>
-    parts.find((candidate) => candidate.type === type)?.value ?? "";
-  return `${part("year")}-${part("month")}-${part("day")}`;
+const pageSize = 10;
+
+function paginationItems(currentPage: number, pageCount: number) {
+  const pages = [...new Set([1, currentPage - 1, currentPage, currentPage + 1, pageCount])]
+    .filter((page) => page >= 1 && page <= pageCount)
+    .sort((left, right) => left - right);
+  return pages.flatMap<number | string>((page, index) => {
+    const previous = pages[index - 1];
+    return index > 0 && previous !== undefined && page - previous > 1
+      ? [`ellipsis-${previous}`, page]
+      : [page];
+  });
 }
 
 export function BookingList() {
@@ -55,9 +62,19 @@ export function BookingList() {
   const locale = useLocale();
   const [bookings, setBookings] = useState<BookingRecord[]>([]);
   const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [status, setStatus] = useState<Status | "all">("all");
   const [service, setService] = useState("all");
   const [date, setDate] = useState("");
+  const [sort, setSort] = useState<OwnerBookingSort>("starts_at_desc");
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [summary, setSummary] = useState({
+    today_count: 0,
+    requested_count: 0,
+    upcoming_count: 0,
+  });
+  const [services, setServices] = useState<ServiceRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<"login" | "unavailable" | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -68,54 +85,71 @@ export function BookingList() {
   const [editStaffId, setEditStaffId] = useState("");
   const [editNote, setEditNote] = useState("");
   const [savingDetails, setSavingDetails] = useState(false);
+  const requestIdRef = useRef(0);
   const detailsDialogRef = useModalFocus<HTMLElement>(Boolean(selectedBooking), () => {
     if (!savingDetails) setSelectedBooking(null);
   });
 
+  useEffect(() => {
+    const timeout = window.setTimeout(() => setDebouncedQuery(query.trim()), 300);
+    return () => window.clearTimeout(timeout);
+  }, [query]);
+
+  useEffect(() => {
+    let active = true;
+    void apiRequest<ServiceRecord[]>(`/api/v1/organizations/${organizationSlug}/owner/services`)
+      .then((data) => {
+        if (active) setServices(data);
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const loadBookings = useCallback(async () => {
+    const requestId = requestIdRef.current + 1;
+    requestIdRef.current = requestId;
     setLoading(true);
     setError(null);
+    const params = new URLSearchParams({
+      limit: String(pageSize),
+      offset: String((page - 1) * pageSize),
+      sort,
+    });
+    if (debouncedQuery) params.set("query", debouncedQuery);
+    if (status !== "all") params.set("status", status);
+    if (service !== "all") params.set("service_id", service);
+    if (date) {
+      params.set("date_from", date);
+      params.set("date_to", date);
+    }
     try {
-      setBookings(
-        await apiRequest<BookingRecord[]>(
-          `/api/v1/organizations/${organizationSlug}/owner/bookings`,
-        ),
+      const data = await apiRequest<OwnerBookingPageRecord>(
+        `/api/v1/organizations/${organizationSlug}/owner/bookings?${params.toString()}`,
       );
+      if (requestId !== requestIdRef.current) return;
+      setBookings(data.items);
+      setTotal(data.total);
+      setSummary(data.summary);
+      const resolvedPageCount = Math.max(1, Math.ceil(data.total / pageSize));
+      if (page > resolvedPageCount) setPage(resolvedPageCount);
     } catch (caught) {
+      if (requestId !== requestIdRef.current) return;
       setError(
         caught instanceof ServiceOpsApiError && [401, 403].includes(caught.status)
           ? "login"
           : "unavailable",
       );
     } finally {
-      setLoading(false);
+      if (requestId === requestIdRef.current) setLoading(false);
     }
-  }, []);
+  }, [date, debouncedQuery, page, service, sort, status]);
 
   useEffect(() => {
-    let active = true;
-    async function load() {
-      try {
-        const data = await apiRequest<BookingRecord[]>(
-          `/api/v1/organizations/${organizationSlug}/owner/bookings`,
-        );
-        if (active) setBookings(data);
-      } catch (caught) {
-        if (!active) return;
-        setError(
-          caught instanceof ServiceOpsApiError && [401, 403].includes(caught.status)
-            ? "login"
-            : "unavailable",
-        );
-      } finally {
-        if (active) setLoading(false);
-      }
-    }
-    void load();
-    return () => {
-      active = false;
-    };
-  }, []);
+    const timeout = window.setTimeout(() => void loadBookings(), 0);
+    return () => window.clearTimeout(timeout);
+  }, [loadBookings]);
 
   const localizedServiceName = useCallback(
     (name: string) => {
@@ -140,43 +174,10 @@ export function BookingList() {
   );
 
   const serviceOptions = useMemo(() => {
-    const values = new Map<string, string>();
-    for (const booking of bookings) {
-      values.set(booking.service.id, localizedServiceName(booking.service.name));
-    }
-    return [...values.entries()].sort((left, right) => left[1].localeCompare(right[1], locale));
-  }, [bookings, locale, localizedServiceName]);
-
-  const filtered = useMemo(() => {
-    const normalized = query.trim().toLocaleLowerCase(locale);
-    return bookings.filter((booking) => {
-      const matchesQuery =
-        !normalized ||
-        localizedCustomerName(booking).toLocaleLowerCase(locale).includes(normalized) ||
-        booking.customer_email.toLocaleLowerCase(locale).includes(normalized) ||
-        localizedServiceName(booking.service.name).toLocaleLowerCase(locale).includes(normalized) ||
-        localizedStaffName(booking.staff.display_name)
-          .toLocaleLowerCase(locale)
-          .includes(normalized) ||
-        booking.id.toLowerCase().includes(normalized);
-      return (
-        matchesQuery &&
-        (status === "all" || booking.status === status) &&
-        (service === "all" || booking.service.id === service) &&
-        (!date || seoulDateKey(booking.starts_at) === date)
-      );
-    });
-  }, [
-    bookings,
-    date,
-    locale,
-    localizedCustomerName,
-    localizedServiceName,
-    localizedStaffName,
-    query,
-    service,
-    status,
-  ]);
+    return services
+      .map((item) => [item.id, localizedServiceName(item.name)] as const)
+      .sort((left, right) => left[1].localeCompare(right[1], locale));
+  }, [locale, localizedServiceName, services]);
 
   const dateFormatter = useMemo(
     () =>
@@ -199,23 +200,17 @@ export function BookingList() {
     [locale],
   );
 
-  const todayKey = seoulDateKey(new Date());
-  const todayCount = bookings.filter(
-    (booking) => seoulDateKey(booking.starts_at) === todayKey,
-  ).length;
-  const requestedCount = bookings.filter((booking) => booking.status === "requested").length;
-  const upcomingCount = bookings.filter(
-    (booking) =>
-      new Date(booking.starts_at) > new Date() &&
-      booking.status !== "cancelled" &&
-      booking.status !== "completed",
-  ).length;
+  const pageCount = Math.max(1, Math.ceil(total / pageSize));
+  const visiblePageItems = useMemo(() => paginationItems(page, pageCount), [page, pageCount]);
 
   function resetFilters() {
     setQuery("");
+    setDebouncedQuery("");
     setStatus("all");
     setService("all");
     setDate("");
+    setSort("starts_at_desc");
+    setPage(1);
   }
 
   async function changeStatus(booking: BookingRecord, nextStatus: Status) {
@@ -231,6 +226,7 @@ export function BookingList() {
       setBookings((current) =>
         current.map((candidate) => (candidate.id === booking.id ? updated : candidate)),
       );
+      await loadBookings();
     } catch {
       setActionError(t("actionFailed"));
     } finally {
@@ -246,6 +242,8 @@ export function BookingList() {
       params.set("date_from", date);
       params.set("date_to", date);
     }
+    if (query.trim()) params.set("query", query.trim());
+    params.set("sort", sort);
     setExporting(true);
     setActionError(null);
     try {
@@ -330,24 +328,32 @@ export function BookingList() {
       ) : null}
 
       <section aria-label={t("highlights")} className="grid grid-cols-3 gap-3">
-        <MiniMetric label={t("today")} value={String(todayCount)} accent="text-brand" />
+        <MiniMetric label={t("today")} value={String(summary.today_count)} accent="text-brand" />
         <MiniMetric
           label={t("awaitingConfirmation")}
-          value={String(requestedCount)}
+          value={String(summary.requested_count)}
           accent="text-amber-600"
         />
-        <MiniMetric label={t("upcoming")} value={String(upcomingCount)} accent="text-sky-700" />
+        <MiniMetric
+          label={t("upcoming")}
+          value={String(summary.upcoming_count)}
+          accent="text-sky-700"
+        />
       </section>
 
       <Card className="overflow-hidden">
         <div className="border-b border-line bg-white p-4 sm:p-5">
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-[minmax(240px,1.4fr)_180px_180px_170px_auto]">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-[minmax(220px,1.4fr)_150px_160px_160px_150px_auto]">
             <label className="relative block">
               <span className="sr-only">{t("searchLabel")}</span>
               <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400" />
               <Input
                 value={query}
-                onChange={(event) => setQuery(event.target.value)}
+                maxLength={200}
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                  setPage(1);
+                }}
                 placeholder={t("searchPlaceholder")}
                 className="pl-9"
               />
@@ -356,7 +362,10 @@ export function BookingList() {
               <span className="sr-only">{t("statusLabel")}</span>
               <Select
                 value={status}
-                onChange={(event) => setStatus(event.target.value as Status | "all")}
+                onChange={(event) => {
+                  setStatus(event.target.value as Status | "all");
+                  setPage(1);
+                }}
               >
                 <option value="all">{t("allStatuses")}</option>
                 {bookingStatuses.map((value) => (
@@ -368,7 +377,13 @@ export function BookingList() {
             </label>
             <label>
               <span className="sr-only">{t("serviceLabel")}</span>
-              <Select value={service} onChange={(event) => setService(event.target.value)}>
+              <Select
+                value={service}
+                onChange={(event) => {
+                  setService(event.target.value);
+                  setPage(1);
+                }}
+              >
                 <option value="all">{t("allServices")}</option>
                 {serviceOptions.map(([id, name]) => (
                   <option key={id} value={id}>
@@ -379,7 +394,10 @@ export function BookingList() {
             </label>
             <LocalizedDatePicker
               value={date}
-              onChange={setDate}
+              onChange={(value) => {
+                setDate(value);
+                setPage(1);
+              }}
               locale={locale}
               label={t("dateLabel")}
               placeholder={t("datePlaceholder")}
@@ -387,6 +405,19 @@ export function BookingList() {
               previousMonthLabel={t("previousMonth")}
               nextMonthLabel={t("nextMonth")}
             />
+            <label>
+              <span className="sr-only">{t("sortLabel")}</span>
+              <Select
+                value={sort}
+                onChange={(event) => {
+                  setSort(event.target.value as OwnerBookingSort);
+                  setPage(1);
+                }}
+              >
+                <option value="starts_at_desc">{t("sortNewest")}</option>
+                <option value="starts_at_asc">{t("sortOldest")}</option>
+              </Select>
+            </label>
             <Button variant="ghost" onClick={resetFilters} className="xl:px-3">
               <RotateCcw className="size-4" /> {t("reset")}
             </Button>
@@ -395,7 +426,7 @@ export function BookingList() {
 
         <div className="flex items-center justify-between border-b border-line bg-[#fbfcfb] px-4 py-3 sm:px-5">
           <p role="status" className="text-xs font-semibold text-muted">
-            {t("results", {count: filtered.length})}
+            {t("results", {count: total})}
           </p>
           <span className="text-[0.68rem] text-muted">UTC+09:00 · Asia/Seoul</span>
         </div>
@@ -438,7 +469,7 @@ export function BookingList() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((booking) => (
+                  {bookings.map((booking) => (
                     <tr
                       key={booking.id}
                       className="border-b border-line last:border-0 hover:bg-subtle/45"
@@ -517,7 +548,7 @@ export function BookingList() {
             </div>
 
             <div className="divide-y divide-line md:hidden">
-              {filtered.map((booking) => (
+              {bookings.map((booking) => (
                 <article key={booking.id} className="p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
@@ -573,8 +604,61 @@ export function BookingList() {
               ))}
             </div>
 
-            {filtered.length === 0 ? (
+            {bookings.length === 0 ? (
               <p className="p-12 text-center text-sm text-muted">{t("empty")}</p>
+            ) : null}
+
+            {bookings.length > 0 ? (
+              <nav
+                aria-label={t("pagination")}
+                className="flex flex-col items-center justify-between gap-3 border-t border-line bg-[#fbfcfb] px-4 py-4 sm:flex-row sm:px-5"
+              >
+                <p className="text-xs font-semibold text-muted">
+                  {t("pageStatus", {page, pages: pageCount})}
+                </p>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setPage((current) => Math.max(1, current - 1))}
+                    disabled={page === 1 || loading}
+                    aria-label={t("previousPage")}
+                    className="px-2.5"
+                  >
+                    <ChevronLeft className="size-4" />
+                  </Button>
+                  {visiblePageItems.map((item) =>
+                    typeof item === "number" ? (
+                      <Button
+                        key={item}
+                        variant={item === page ? "primary" : "ghost"}
+                        size="sm"
+                        onClick={() => setPage(item)}
+                        disabled={loading}
+                        aria-current={item === page ? "page" : undefined}
+                        aria-label={t("goToPage", {page: item})}
+                        className="min-w-9 px-2.5"
+                      >
+                        {item}
+                      </Button>
+                    ) : (
+                      <span key={item} aria-hidden="true" className="px-1 text-sm text-muted">
+                        …
+                      </span>
+                    ),
+                  )}
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setPage((current) => Math.min(pageCount, current + 1))}
+                    disabled={page === pageCount || loading}
+                    aria-label={t("nextPage")}
+                    className="px-2.5"
+                  >
+                    <ChevronRight className="size-4" />
+                  </Button>
+                </div>
+              </nav>
             ) : null}
           </>
         )}

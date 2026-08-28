@@ -4,7 +4,7 @@
 
 ServiceOps is a personal, non-commercial portfolio demo of a web-based booking and operations platform for small field-service teams. It demonstrates customers requesting available services, staff managing assigned work, and owners overseeing schedules, people, reporting, and audit history in one organization-scoped system.
 
-> **Current status:** The implemented local product workflows and Milestone 5 portfolio polish are complete. A clean checkout, 21 backend tests, 12 isolated Playwright flows, bilingual screenshots, and English/Korean workflow GIFs have been verified. The remaining release gates are a human screen-reader and physical-device review, an explicitly approved zero-cost deployment validation, a pagination decision for owner booking results, and the MVP release tag.
+> **Current status:** The implemented local product workflows and Milestone 5 portfolio polish are complete. A clean checkout, 22 backend tests, 12 isolated Playwright flows, bilingual screenshots, and English/Korean workflow GIFs have been verified. Owner booking results now support server-side search, filters, schedule sorting, and pagination. The remaining release gates are a human screen-reader and physical-device review, an explicitly approved zero-cost deployment validation, and the MVP release tag.
 
 ## Implemented routes
 
@@ -190,10 +190,9 @@ The public [GitHub repository](https://github.com/dong0277/serviceops) is the sy
 ## Roadmap
 
 1. VoiceOver plus a second screen-reader auditory review and physical-device ergonomics confirmation
-2. Decide whether to implement owner-booking pagination for the MVP or explicitly defer it
-3. Approved zero-cost public deployment and final cookie, CORS, CSRF, domain, and rate-limit validation
-4. MVP release tag after every acceptance criterion passes
-5. Post-MVP extraction of proven generic project patterns
+2. Approved zero-cost public deployment and final cookie, CORS, CSRF, domain, and rate-limit validation
+3. MVP release tag after every acceptance criterion passes
+4. Post-MVP extraction of proven generic project patterns
 
 ## License
 

@@ -2,7 +2,7 @@
 
 ## Status
 
-The implemented local product workflows and Milestone 5 portfolio polish are complete. PostgreSQL persists the booking domain, status history, and immutable organization-scoped audit events. Customer, staff, and owner APIs enforce role and organization scope; the database atomically rejects overlapping active bookings. Responsive Korean/English product surfaces consume the live APIs, while critical role journeys, WCAG 2.1 AA axe checks, keyboard-dialog checks, reflow, forced-colors, reduced-motion, and touch-target geometry run through Playwright against an isolated temporary Docker stack. Owner-booking pagination remains a documented specification gap, and public deployment remains provisional and unvalidated.
+The implemented local product workflows and Milestone 5 portfolio polish are complete. PostgreSQL persists the booking domain, status history, and immutable organization-scoped audit events. Customer, staff, and owner APIs enforce role and organization scope; the database atomically rejects overlapping active bookings. Owner booking results expose server-side search, filters, schedule sorting, and bounded pagination. Responsive Korean/English product surfaces consume the live APIs, while critical role journeys, WCAG 2.1 AA axe checks, keyboard-dialog checks, reflow, forced-colors, reduced-motion, and touch-target geometry run through Playwright against an isolated temporary Docker stack. Public deployment remains provisional and unvalidated.
 
 ## Components
 
@@ -45,7 +45,7 @@ Refresh → locked session row → rotate access, refresh, and CSRF credentials 
 
 FastAPI resolves the path organization and authenticated membership before protected queries run. A user outside the organization receives a non-revealing 404, a member with the wrong role receives 403, and customer booking reads add the authenticated customer UUID to the organization scope. UI route visibility is never an authorization boundary.
 
-The dashboard endpoint aggregates a bounded 1–90 day interval ending today in the organization timezone. The calendar requests the visible month through the existing owner-booking filters and renders the same response as a desktop month grid or mobile agenda, avoiding a second scheduling data model.
+The dashboard endpoint aggregates a bounded 1–90 day interval ending today in the organization timezone. The owner booking list uses a stable `items`/`total`/`limit`/`offset` response with schedule sort order and organization-wide summary metrics. The calendar requests the visible month through the same owner-booking filters and accumulates every bounded API page before rendering a desktop month grid or mobile agenda, avoiding a second scheduling data model.
 
 Weekly local availability is interpreted in the organization's IANA timezone. Persisted booking and time-off timestamps are timezone-aware and normalized by PostgreSQL. Slot responses carry UTC instants and the web renders them in `Asia/Seoul` for the demo organization.
 

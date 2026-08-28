@@ -1,5 +1,6 @@
 import uuid
 from datetime import UTC, date, datetime, time
+from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -197,6 +198,25 @@ class OwnerBookingResponse(CustomerBookingResponse):
     customer_display_name: str
     customer_email: str
     internal_note: str | None
+
+
+class OwnerBookingSort(StrEnum):
+    STARTS_AT_DESC = "starts_at_desc"
+    STARTS_AT_ASC = "starts_at_asc"
+
+
+class OwnerBookingListSummary(BaseModel):
+    today_count: int
+    requested_count: int
+    upcoming_count: int
+
+
+class OwnerBookingPageResponse(BaseModel):
+    items: list[OwnerBookingResponse]
+    total: int
+    limit: int
+    offset: int
+    summary: OwnerBookingListSummary
 
 
 class StaffBookingResponse(CustomerBookingResponse):

@@ -12,6 +12,7 @@ from app.domain_schemas import (
     DashboardServiceMetric,
     DashboardStaffMetric,
     DashboardStatusMetric,
+    OwnerBookingSort,
     OwnerCustomerResponse,
     OwnerDashboardResponse,
 )
@@ -157,6 +158,8 @@ def export_owner_bookings_csv(
     staff_profile_id: uuid.UUID | None = None,
     date_from: date | None = None,
     date_to: date | None = None,
+    query: str | None = None,
+    sort: OwnerBookingSort = OwnerBookingSort.STARTS_AT_DESC,
 ) -> str:
     bookings = find_owner_bookings(
         db,
@@ -167,6 +170,8 @@ def export_owner_bookings_csv(
         staff_profile_id=staff_profile_id,
         date_from=date_from,
         date_to=date_to,
+        query=query,
+        sort=sort,
     )
     timezone = ZoneInfo(timezone_name)
     output = io.StringIO(newline="")
@@ -214,6 +219,8 @@ def export_owner_bookings_csv(
             "staff_profile_id": str(staff_profile_id) if staff_profile_id else None,
             "date_from": date_from.isoformat() if date_from else None,
             "date_to": date_to.isoformat() if date_to else None,
+            "query_applied": bool(query and query.strip()),
+            "sort": sort.value,
         },
     )
     db.commit()

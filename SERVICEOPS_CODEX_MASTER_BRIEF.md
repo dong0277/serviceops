@@ -23,11 +23,11 @@ Do not silently change a decision. Record proposed changes as an ADR and ask for
 
 ### Current checkpoint — 2026-08-28
 
-- Milestones 0 through 4 were implemented in the local, reproducible environment; the documentation reconciliation later identified owner-booking pagination as a remaining Part B specification gap.
+- Milestones 0 through 4 were implemented in the local, reproducible environment, and the owner-booking pagination gap identified during documentation reconciliation has now been implemented.
 - Milestone 5 local portfolio work is complete: clean-checkout verification, reciprocal English/Korean READMEs, bilingual screenshots and workflow GIFs, case study, automated accessibility baseline, responsive/touch-target regression coverage, and non-commercial copy review.
 - The public repository is `dong0277/serviceops`, uses pnpm, is licensed under MIT, and is the synchronization point between the developer's two work locations.
 - No public deployment or ServiceOps-specific Vercel/Supabase project has been created. The provisional zero-cost topology remains Vercel Hobby for web/API plus Supabase Free for PostgreSQL only.
-- Release gates still open: VoiceOver and a second screen-reader auditory review, physical-device ergonomics confirmation, owner-booking pagination implementation or an explicit scope decision, approved deployment/domain security validation, and the MVP release tag.
+- Release gates still open: VoiceOver and a second screen-reader auditory review, physical-device ergonomics confirmation, approved deployment/domain security validation, and the MVP release tag.
 - Historical progress records below describe the state at the time of each milestone and do not override this checkpoint.
 
 ---
@@ -1237,6 +1237,8 @@ Non-commercial portfolio review record (2026-08-28): confirmed that the reposito
 Documentation reconciliation record (2026-08-28): reviewed every tracked project Markdown document against the repository, configuration, recent milestone records, and public non-commercial policy. Updated the README, architecture, API, security, accessibility, case study, design-spike history, and ADR status language; completed the required architecture flows and representative local API examples; corrected the manual review URL to the default port; recorded that public deployment is still uncreated and provisional; separated local seed identities from future resettable public-demo identities; and replaced completed milestone deferrals with their actual outcomes. The review also found that owner audit logs support bounded `limit`/`offset`, while owner booking results still lack the pagination required by Part B. Pagination must be implemented or explicitly deferred before the release tag.
 
 Bilingual portfolio record (2026-08-28): kept `README.md` as the English GitHub default, added the complete Korean `README.ko.md`, and connected them with reciprocal language links. Generalized the isolated portfolio capture scripts with a validated `PORTFOLIO_LOCALE` selector while preserving the existing English filenames. Added `make portfolio-captures-ko` and `make portfolio-demo-ko`, generated four Korean screenshots plus an eight-frame Korean workflow GIF under distinct `-ko` filenames, and linked those assets from the Korean README. The screenshots and representative GIF frames were visually checked for Korean content, clipping, and layout integrity.
+
+Owner-booking pagination record (2026-08-28): replaced the unbounded owner booking list contract with a stable `items`/`total`/`limit`/`offset` envelope, bounded 1–100 row pages, server-side customer/service/staff/booking-ID search, status/service/staff/date filters, and ascending or descending schedule sorting. The Korean/English owner UI now uses 10-row numbered pages and retains organization-wide booking highlights; CSV export follows the active search, filters, and sort. The calendar accumulates every page for its bounded visible month so pagination cannot silently omit events. Backend integration coverage is now 22 tests, including page boundaries, filtered totals, search, sort order, summary metrics, and invalid parameter handling. Formatting, lint, strict type checking, the production build, all 22 backend tests, and all 12 isolated accessibility and critical-flow browser tests pass.
 
 ## 23. Acceptance Criteria
 

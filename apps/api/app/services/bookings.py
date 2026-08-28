@@ -2,9 +2,10 @@ import uuid
 from datetime import UTC, date, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
-from sqlalchemy import select
+from sqlalchemy import String, cast, func, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
+from sqlalchemy.sql import Select
 
 from app.domain_schemas import (
     BookingCreate,
@@ -14,13 +15,16 @@ from app.domain_schemas import (
     BookingStatusHistoryResponse,
     CustomerBookingResponse,
     OwnerBookingDetailResponse,
+    OwnerBookingListSummary,
+    OwnerBookingPageResponse,
     OwnerBookingResponse,
+    OwnerBookingSort,
     OwnerBookingUpdate,
     StaffBookingDetailResponse,
     StaffBookingResponse,
 )
 from app.errors import ApiError
-from app.models import Booking, BookingStatus, BookingStatusHistory, StaffProfile
+from app.models import Booking, BookingStatus, BookingStatusHistory, Service, StaffProfile, User
 from app.services.audit import AuditAction, record_audit
 from app.services.availability import validate_booking_availability
 from app.services.catalog import get_service
@@ -384,8 +388,7 @@ def cancel_booking(
     return to_customer_response(booking)
 
 
-def find_owner_bookings(
-    db: Session,
+def _owner_booking_statement(
     organization_id: uuid.UUID,
     timezone_name: str,
     *,
@@ -394,7 +397,8 @@ def find_owner_bookings(
     staff_profile_id: uuid.UUID | None = None,
     date_from: date | None = None,
     date_to: date | None = None,
-) -> list[Booking]:
+    query: str | None = None,
+) -> Select[tuple[Booking]]:
     if date_from is not None and date_to is not None and date_to < date_from:
         raise ApiError(422, "invalid_date_range", "date_to must be on or after date_from.")
     statement = (
@@ -419,7 +423,105 @@ def find_owner_bookings(
     if date_to is not None:
         end = datetime.combine(date_to + timedelta(days=1), time.min, timezone).astimezone(UTC)
         statement = statement.where(Booking.starts_at < end)
-    return list(db.scalars(statement.order_by(Booking.starts_at.desc(), Booking.id)))
+    normalized_query = query.strip() if query else ""
+    if normalized_query:
+        pattern = f"%{normalized_query}%"
+        statement = (
+            statement.join(User, Booking.customer_user_id == User.id)
+            .join(Service, Booking.service_id == Service.id)
+            .join(StaffProfile, Booking.staff_profile_id == StaffProfile.id)
+            .where(
+                or_(
+                    User.display_name.ilike(pattern),
+                    User.email.ilike(pattern),
+                    Service.name.ilike(pattern),
+                    StaffProfile.display_name.ilike(pattern),
+                    cast(Booking.id, String).ilike(pattern),
+                )
+            )
+        )
+    return statement
+
+
+def _order_owner_bookings(
+    statement: Select[tuple[Booking]],
+    sort: OwnerBookingSort,
+) -> Select[tuple[Booking]]:
+    starts_at = (
+        Booking.starts_at.asc()
+        if sort == OwnerBookingSort.STARTS_AT_ASC
+        else Booking.starts_at.desc()
+    )
+    return statement.order_by(starts_at, Booking.id)
+
+
+def find_owner_bookings(
+    db: Session,
+    organization_id: uuid.UUID,
+    timezone_name: str,
+    *,
+    status: BookingStatus | None = None,
+    service_id: uuid.UUID | None = None,
+    staff_profile_id: uuid.UUID | None = None,
+    date_from: date | None = None,
+    date_to: date | None = None,
+    query: str | None = None,
+    sort: OwnerBookingSort = OwnerBookingSort.STARTS_AT_DESC,
+) -> list[Booking]:
+    statement = _owner_booking_statement(
+        organization_id,
+        timezone_name,
+        status=status,
+        service_id=service_id,
+        staff_profile_id=staff_profile_id,
+        date_from=date_from,
+        date_to=date_to,
+        query=query,
+    )
+    return list(db.scalars(_order_owner_bookings(statement, sort)))
+
+
+def _owner_booking_summary(
+    db: Session,
+    organization_id: uuid.UUID,
+    timezone_name: str,
+) -> OwnerBookingListSummary:
+    timezone = ZoneInfo(timezone_name)
+    now = datetime.now(UTC)
+    today = now.astimezone(timezone).date()
+    today_start = datetime.combine(today, time.min, timezone).astimezone(UTC)
+    tomorrow_start = datetime.combine(today + timedelta(days=1), time.min, timezone).astimezone(UTC)
+    today_count = db.scalar(
+        select(func.count())
+        .select_from(Booking)
+        .where(
+            Booking.organization_id == organization_id,
+            Booking.starts_at >= today_start,
+            Booking.starts_at < tomorrow_start,
+        )
+    )
+    requested_count = db.scalar(
+        select(func.count())
+        .select_from(Booking)
+        .where(
+            Booking.organization_id == organization_id,
+            Booking.status == BookingStatus.REQUESTED,
+        )
+    )
+    upcoming_count = db.scalar(
+        select(func.count())
+        .select_from(Booking)
+        .where(
+            Booking.organization_id == organization_id,
+            Booking.starts_at > now,
+            Booking.status.notin_([BookingStatus.CANCELLED, BookingStatus.COMPLETED]),
+        )
+    )
+    return OwnerBookingListSummary(
+        today_count=today_count or 0,
+        requested_count=requested_count or 0,
+        upcoming_count=upcoming_count or 0,
+    )
 
 
 def list_owner_bookings(
@@ -432,20 +534,33 @@ def list_owner_bookings(
     staff_profile_id: uuid.UUID | None = None,
     date_from: date | None = None,
     date_to: date | None = None,
-) -> list[OwnerBookingResponse]:
-    return [
-        to_owner_response(booking)
-        for booking in find_owner_bookings(
-            db,
-            organization_id,
-            timezone_name,
-            status=status,
-            service_id=service_id,
-            staff_profile_id=staff_profile_id,
-            date_from=date_from,
-            date_to=date_to,
-        )
-    ]
+    query: str | None = None,
+    sort: OwnerBookingSort = OwnerBookingSort.STARTS_AT_DESC,
+    limit: int = 10,
+    offset: int = 0,
+) -> OwnerBookingPageResponse:
+    statement = _owner_booking_statement(
+        organization_id,
+        timezone_name,
+        status=status,
+        service_id=service_id,
+        staff_profile_id=staff_profile_id,
+        date_from=date_from,
+        date_to=date_to,
+        query=query,
+    )
+    count_statement = statement.with_only_columns(
+        func.count(), maintain_column_froms=True
+    ).order_by(None)
+    total = db.scalar(count_statement) or 0
+    bookings = db.scalars(_order_owner_bookings(statement, sort).offset(offset).limit(limit))
+    return OwnerBookingPageResponse(
+        items=[to_owner_response(booking) for booking in bookings],
+        total=total,
+        limit=limit,
+        offset=offset,
+        summary=_owner_booking_summary(db, organization_id, timezone_name),
+    )
 
 
 def list_staff_bookings(

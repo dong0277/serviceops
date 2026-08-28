@@ -25,12 +25,34 @@ import {
   bookingStatuses,
   bookingStatusTone,
   type BookingStatus,
+  type OwnerBookingPageRecord,
   type OwnerBookingRecord,
   type ServiceRecord,
   type StaffProfileRecord,
 } from "@/lib/operations-types";
 
 const organizationSlug = "demo-services";
+const calendarPageSize = 100;
+
+async function loadAllCalendarBookings(params: URLSearchParams) {
+  const rows: OwnerBookingRecord[] = [];
+  let offset = 0;
+  let total = 0;
+  do {
+    const pageParams = new URLSearchParams(params);
+    pageParams.set("limit", String(calendarPageSize));
+    pageParams.set("offset", String(offset));
+    pageParams.set("sort", "starts_at_asc");
+    const page = await apiRequest<OwnerBookingPageRecord>(
+      `/api/v1/organizations/${organizationSlug}/owner/bookings?${pageParams.toString()}`,
+    );
+    rows.push(...page.items);
+    total = page.total;
+    if (page.items.length === 0) break;
+    offset += page.items.length;
+  } while (offset < total);
+  return rows;
+}
 
 function seoulDateKey(value: string | Date) {
   const parts = new Intl.DateTimeFormat("en", {
@@ -114,9 +136,7 @@ export function BookingCalendar() {
     if (staffId !== "all") params.set("staff_profile_id", staffId);
     try {
       const [bookingData, serviceData, staffData] = await Promise.all([
-        apiRequest<OwnerBookingRecord[]>(
-          `/api/v1/organizations/${organizationSlug}/owner/bookings?${params.toString()}`,
-        ),
+        loadAllCalendarBookings(params),
         services.length
           ? Promise.resolve(services)
           : apiRequest<ServiceRecord[]>(`/api/v1/organizations/${organizationSlug}/owner/services`),
@@ -152,9 +172,7 @@ export function BookingCalendar() {
       if (staffId !== "all") params.set("staff_profile_id", staffId);
       try {
         const [bookingData, serviceData, staffData] = await Promise.all([
-          apiRequest<OwnerBookingRecord[]>(
-            `/api/v1/organizations/${organizationSlug}/owner/bookings?${params.toString()}`,
-          ),
+          loadAllCalendarBookings(params),
           services.length
             ? Promise.resolve(services)
             : apiRequest<ServiceRecord[]>(

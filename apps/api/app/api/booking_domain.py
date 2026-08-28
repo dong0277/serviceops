@@ -18,7 +18,8 @@ from app.domain_schemas import (
     BookingStatusUpdate,
     CustomerBookingResponse,
     OwnerBookingDetailResponse,
-    OwnerBookingResponse,
+    OwnerBookingPageResponse,
+    OwnerBookingSort,
     OwnerBookingUpdate,
     OwnerCustomerResponse,
     OwnerDashboardResponse,
@@ -327,7 +328,7 @@ def available_slots(
     )
 
 
-@router.get("/{organization_slug}/owner/bookings", response_model=list[OwnerBookingResponse])
+@router.get("/{organization_slug}/owner/bookings", response_model=OwnerBookingPageResponse)
 def owner_bookings(
     principal: OwnerPrincipal,
     db: DatabaseSession,
@@ -336,7 +337,11 @@ def owner_bookings(
     staff_profile_id: uuid.UUID | None = None,
     date_from: date | None = None,
     date_to: date | None = None,
-) -> list[OwnerBookingResponse]:
+    query: Annotated[str | None, Query(max_length=200)] = None,
+    sort: OwnerBookingSort = OwnerBookingSort.STARTS_AT_DESC,
+    limit: Annotated[int, Query(ge=1, le=100)] = 10,
+    offset: Annotated[int, Query(ge=0)] = 0,
+) -> OwnerBookingPageResponse:
     return list_owner_bookings(
         db,
         principal.organization.id,
@@ -346,6 +351,10 @@ def owner_bookings(
         staff_profile_id=staff_profile_id,
         date_from=date_from,
         date_to=date_to,
+        query=query,
+        sort=sort,
+        limit=limit,
+        offset=offset,
     )
 
 
@@ -378,6 +387,8 @@ def owner_export_bookings(
     staff_profile_id: uuid.UUID | None = None,
     date_from: date | None = None,
     date_to: date | None = None,
+    query: Annotated[str | None, Query(max_length=200)] = None,
+    sort: OwnerBookingSort = OwnerBookingSort.STARTS_AT_DESC,
 ) -> Response:
     content = export_owner_bookings_csv(
         db,
@@ -389,6 +400,8 @@ def owner_export_bookings(
         staff_profile_id=staff_profile_id,
         date_from=date_from,
         date_to=date_to,
+        query=query,
+        sort=sort,
     )
     return Response(
         content=content,
