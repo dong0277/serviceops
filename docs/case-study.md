@@ -10,7 +10,7 @@ ServiceOps is a personal portfolio implementation of a focused replacement: one 
 
 The MVP needed to support customer, staff, and owner roles in Korean and English; generate bookable slots from weekly availability and time off; prevent overlapping active appointments; preserve customer privacy and internal notes; expose operational reports and CSV export; and remain reproducible on a developer laptop.
 
-The project deliberately uses fictional `.test` identities. It sells and fulfills no real services and accepts no payment. PostgreSQL and Docker Compose are the local baseline. The unvalidated public target is Vercel Hobby for the web and API plus Supabase Free for PostgreSQL; external projects and deployment still require explicit approval, and recurring cost must remain zero.
+The project deliberately uses fictional `.test` identities. It sells and fulfills no real services and accepts no payment. PostgreSQL and Docker Compose are the runtime baseline. The `v1.0.0` portfolio is intentionally delivered through GitHub, bilingual media, documentation, and a clean-checkout local workflow rather than a live free-tier deployment.
 
 ## Architecture choice
 
@@ -54,7 +54,7 @@ The English screenshots are generated from deterministic fictional seed data wit
 
 Backend integration tests cover authentication, session rotation, CSRF, tenancy, role isolation, service operations, availability, cancellation and rescheduling, paginated owner search and sorting, audit records, CSV sanitization, dashboard metrics, and near-concurrent booking attempts. Playwright covers the primary customer, staff, and owner journeys plus responsive English localization and authorization denial.
 
-Automated axe checks target WCAG 2.0/2.1 A and AA rules across representative routes. Keyboard tests cover focus trapping, Escape dismissal, and focus restoration. Additional coverage checks 200%-equivalent reflow, reduced-motion behavior, forced colors, horizontal overflow, and representative touch-target geometry. VoiceOver, a second screen-reader/browser combination, and physical-device ergonomics remain release gates.
+Automated axe checks target WCAG 2.0/2.1 A and AA rules across representative routes. Keyboard tests cover focus trapping, Escape dismissal, and focus restoration. Additional coverage checks 200%-equivalent reflow, reduced-motion behavior, forced colors, horizontal overflow, and representative touch-target geometry. Manual VoiceOver/additional-screen-reader and physical-device review were explicitly deferred and are not validation claims of this release.
 
 ## Security and privacy decisions
 
@@ -73,4 +73,4 @@ The MVP excludes payments, invoicing, payroll, accounting, chat, AI features, na
 
 ServiceOps now demonstrates a complete local workflow: deterministic setup, secure sessions, organization-scoped APIs, conflict-safe booking, responsive bilingual role surfaces, live operations reporting, auditability, and automated quality gates. A clean checkout has been verified independently of the original working directory.
 
-The next phase is a human assistive-technology and physical-device review. An approved public deployment must revalidate cookie, CORS, CSRF, and same-site behavior against the final domains and replace or supplement the process-local login limiter before multi-instance operation. After the zero-cost topology and acceptance checklist are confirmed, the repository can receive its first MVP release tag.
+The GitHub-first MVP is ready for its `v1.0.0` release tag after the documented local quality gates pass. Manual assistive-technology/device review, a zero-cost live deployment experiment, and extraction of proven generic patterns are independent optional post-MVP work. Any future multi-instance public deployment must revalidate cookie, CORS, CSRF, and same-site behavior against the final domains and replace or supplement the process-local login limiter.

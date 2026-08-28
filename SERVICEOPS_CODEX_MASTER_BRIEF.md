@@ -23,11 +23,12 @@ Do not silently change a decision. Record proposed changes as an ADR and ask for
 
 ### Current checkpoint — 2026-08-28
 
-- Milestones 0 through 4 were implemented in the local, reproducible environment, and the owner-booking pagination gap identified during documentation reconciliation has now been implemented.
-- Milestone 5 local portfolio work is complete: clean-checkout verification, reciprocal English/Korean READMEs, bilingual screenshots and workflow GIFs, case study, automated accessibility baseline, responsive/touch-target regression coverage, and non-commercial copy review.
+- Milestones 0 through 5 are implemented in the local, reproducible environment, including the owner-booking pagination gap identified during documentation reconciliation.
+- The GitHub-first portfolio is complete: clean-checkout verification, reciprocal English/Korean READMEs, bilingual screenshots and workflow GIFs, case study, automated accessibility baseline, responsive/touch-target regression coverage, and non-commercial copy review.
 - The public repository is `dong0277/serviceops`, uses pnpm, is licensed under MIT, and is the synchronization point between the developer's two work locations.
-- No public deployment or ServiceOps-specific Vercel/Supabase project has been created. The provisional zero-cost topology remains Vercel Hobby for web/API plus Supabase Free for PostgreSQL only.
-- Release gates still open: VoiceOver and a second screen-reader auditory review, physical-device ergonomics confirmation, approved deployment/domain security validation, and the MVP release tag.
+- User decision (2026-08-29): deliver `v1.0.0` through GitHub and the reproducible local stack; do not create a ServiceOps-specific public deployment for the MVP.
+- User decision (2026-08-29): defer VoiceOver/additional-screen-reader and physical-device review. These are not release gates and must not be presented as completed validation.
+- No unresolved MVP scope gates remain. The user explicitly authorized final automated verification, the `v1.0.0` tag, and the associated commit and remote push.
 - Historical progress records below describe the state at the time of each milestone and do not override this checkpoint.
 
 ---
@@ -203,20 +204,21 @@ Docker Desktop and Docker Compose must be available in both work locations. Do n
 
 ### 4.5 Deployment
 
-Local development and automated tests come first.
+Local development, automated tests, and GitHub portfolio delivery are the accepted MVP baseline.
 
-User decision (2026-08-28): public deployment is for a personal, non-commercial portfolio and must have no recurring hosting cost. The deployed product must not advertise paid services, solicit freelance work, collect payment, or imply that fictional field services will be fulfilled.
+User decision (2026-08-29), superseding the provisional 2026-08-28 hosting proposal: the public GitHub repository is sufficient for the personal, non-commercial portfolio. Do not create ServiceOps-specific Vercel, Supabase, custom-domain, or other hosting resources for `v1.0.0`.
 
-The likely public-demo deployment is:
+The MVP delivery topology is:
 
 ```text
 GitHub monorepo
-├── Vercel Hobby project: apps/web
-├── Vercel Hobby project: apps/api
-└── Supabase Free project: PostgreSQL only
+├── bilingual README and case study
+├── English/Korean screenshots and workflow GIFs
+├── CI and source history
+└── clean-checkout Docker Compose workflow
 ```
 
-This remains provisional until an approved working vertical slice is deployed and the zero-cost limits are validated. No ServiceOps-specific Vercel or Supabase project exists yet. Use the provider domains initially and do not purchase a custom domain. If Vercel Functions, free-tier terms, or database suspension create a real technical problem, document the evidence in an ADR and propose another zero-cost host. Do not switch hosting providers silently.
+Live hosting is optional post-MVP work, not unfinished release work. If reconsidered, it requires a new explicit user decision and an ADR covering a zero-recurring-cost provider, runtime behavior, migrations, secrets, resettable fictional identities, cookies, CORS, CSRF, rate limiting, logging, health checks, and rollback. Do not create accounts, resources, or domains silently.
 
 Normal test and build workflows must not depend on production credentials.
 
@@ -442,14 +444,14 @@ Add staff workflows and owner management only after the vertical slice and domai
 
 Complete customer, staff, and owner pages, operational patterns, responsive states, accessibility, and end-to-end tests.
 
-### Milestone 5: personal public portfolio and deployment
+### Milestone 5: personal GitHub portfolio and release
 
 - Configure safe demo data and demo-role entry paths.
-- Deploy preview and production environments only with approval.
 - Add screenshots and a short demo recording.
 - Complete README and case study.
 - Verify a clean checkout.
 - Tag the MVP only when the acceptance criteria pass.
+- Treat live deployment and manual assistive-technology/device review as optional post-MVP work under the 2026-08-29 user decision.
 
 ### Milestone 6: reusable template extraction
 
@@ -520,6 +522,7 @@ Do not add these merely to demonstrate technology:
 - Native mobile applications
 - Chat, messaging, or AI features inside ServiceOps
 - Paid deployment resources without approval
+- Live public hosting as a requirement for `v1.0.0`
 
 AI is part of the development process, not an in-product ServiceOps feature.
 
@@ -1239,6 +1242,10 @@ Documentation reconciliation record (2026-08-28): reviewed every tracked project
 Bilingual portfolio record (2026-08-28): kept `README.md` as the English GitHub default, added the complete Korean `README.ko.md`, and connected them with reciprocal language links. Generalized the isolated portfolio capture scripts with a validated `PORTFOLIO_LOCALE` selector while preserving the existing English filenames. Added `make portfolio-captures-ko` and `make portfolio-demo-ko`, generated four Korean screenshots plus an eight-frame Korean workflow GIF under distinct `-ko` filenames, and linked those assets from the Korean README. The screenshots and representative GIF frames were visually checked for Korean content, clipping, and layout integrity.
 
 Owner-booking pagination record (2026-08-28): replaced the unbounded owner booking list contract with a stable `items`/`total`/`limit`/`offset` envelope, bounded 1–100 row pages, server-side customer/service/staff/booking-ID search, status/service/staff/date filters, and ascending or descending schedule sorting. The Korean/English owner UI now uses 10-row numbered pages and retains organization-wide booking highlights; CSV export follows the active search, filters, and sort. The calendar accumulates every page for its bounded visible month so pagination cannot silently omit events. Backend integration coverage is now 22 tests, including page boundaries, filtered totals, search, sort order, summary metrics, and invalid parameter handling. Formatting, lint, strict type checking, the production build, all 22 backend tests, and all 12 isolated accessibility and critical-flow browser tests pass.
+
+GitHub-first release decision record (2026-08-29): the user decided that the public GitHub repository, bilingual README files, portfolio media, case study, source history, and clean-checkout Docker workflow are sufficient for the personal, non-commercial portfolio. The earlier provisional Vercel Hobby and Supabase Free topology is superseded; live hosting is optional post-MVP work and no ServiceOps-specific external resources will be created for `v1.0.0`. The user also explicitly deferred VoiceOver/additional-screen-reader auditory review and physical-device ergonomics confirmation. Automated axe, keyboard, reflow, forced-colors, reduced-motion, overflow, and touch-target checks remain the accessibility evidence for this release, which makes no manual assistive-technology, physical-device, or live-deployment validation claim.
+
+MVP release verification record (2026-08-29): after the GitHub-first scope decision was reconciled across the bilingual README files, ADRs, architecture, security, accessibility, manual-review checklist, case study, and this master brief, the complete local quality sequence passed: `make lint`, `make type-check`, `make test`, `make build`, and `make e2e`. Ruff and Prettier formatting checks, ESLint, strict Python and TypeScript type checking, all 22 PostgreSQL-backed backend tests, the Webpack production build for all 24 localized routes, container builds and migrations, and all 12 isolated Playwright accessibility and critical-role flows succeeded. The user explicitly authorized the final commit, remote push, and annotated `v1.0.0` tag.
 
 ## 23. Acceptance Criteria
 

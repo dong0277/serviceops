@@ -2,7 +2,7 @@
 
 ## Status and scope
 
-The local MVP implements password authentication, revocable browser sessions, CSRF protection, organization memberships, service and availability management, customer-owned booking operations, staff assigned-work transitions, owner operations, organization-scoped audit logging, and responsive role surfaces. Milestone 5 keeps browser tests and portfolio capture workflows isolated from the development database. Password reset remains outside the MVP, and deployment-specific controls have not been validated because no public environment exists yet.
+The local MVP implements password authentication, revocable browser sessions, CSRF protection, organization memberships, service and availability management, customer-owned booking operations, staff assigned-work transitions, owner operations, organization-scoped audit logging, and responsive role surfaces. Milestone 5 keeps browser tests and portfolio capture workflows isolated from the development database. Password reset remains outside the MVP. Public deployment is intentionally outside `v1.0.0`, so the release makes no deployment-specific security validation claim.
 
 ## Authentication design
 
@@ -54,7 +54,7 @@ The local MVP implements password authentication, revocable browser sessions, CS
 
 Controls currently address stolen database rows, password guessing, basic account enumeration, cross-site cookie mutations, refresh-token replay after rotation, revoked sessions, role escalation, cross-organization reads, cross-customer booking reads, and concurrent double-booking.
 
-Remaining limitations:
+Remaining limitations and conditions for any future public hosting:
 
 - The login limiter is process-local. A multi-instance public deployment requires a shared limiter at the API gateway or a dedicated store.
 - Same-site and cross-origin cookie behavior must be revalidated against the final web and API domains before deployment.

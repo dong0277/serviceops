@@ -5,7 +5,7 @@
 
 ## Context
 
-ServiceOps requires relational modeling, transactions, booking conflict protection, organization isolation, deterministic tests, and a reproducible local environment. The provisional zero-cost public target uses Supabase Free-hosted PostgreSQL while FastAPI remains the business API.
+ServiceOps requires relational modeling, transactions, booking conflict protection, organization isolation, deterministic tests, and a reproducible local environment. The GitHub-first `v1.0.0` release uses local PostgreSQL through Docker Compose and has no selected public database target; FastAPI remains the business API in every environment.
 
 Development takes place from two locations, so local database files or Docker volumes cannot be the source of truth.
 

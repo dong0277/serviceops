@@ -2,7 +2,7 @@
 
 ## Current scope
 
-ServiceOps targets WCAG 2.1 Level AA for the public booking, authentication, customer, staff, and owner surfaces. The completed local Milestone 5 baseline combines automated checks with keyboard and responsive browser checks; it is not a substitute for a human assistive-technology review before public deployment.
+ServiceOps targets WCAG 2.1 Level AA for the public booking, authentication, customer, staff, and owner surfaces. The completed local Milestone 5 baseline combines automated axe checks with keyboard and responsive browser checks. The GitHub-first `v1.0.0` release does not claim manual assistive-technology or physical-device validation.
 
 ## Implemented baseline
 
@@ -24,7 +24,7 @@ The command creates a temporary `serviceops-e2e` Docker Compose project with its
 E2E_WEB_PORT=13001 E2E_API_PORT=18001 E2E_POSTGRES_PORT=15433 make e2e
 ```
 
-## Remaining release checks
+## Validation status
 
 ### Environment-assisted review — 2026-08-28
 
@@ -38,4 +38,6 @@ E2E_WEB_PORT=13001 E2E_API_PORT=18001 E2E_POSTGRES_PORT=15433 make e2e
 | Representative mobile layout             | Pass   | Customer booking and staff assigned-work views reviewed at 390 × 844 and captured without horizontal overflow                    |
 | Minimum touch-target geometry            | Pass   | Representative customer, staff, and owner pages reject visible interactive targets below 24 CSS pixels at 390 × 844              |
 
-Before a public release, complete the procedures in [manual-accessibility-review.md](manual-accessibility-review.md): perform an auditory review with VoiceOver and at least one additional screen-reader/browser combination, then confirm representative touch targets on the intended physical devices. Automated semantics and visual emulation do not validate announcement quality, reading order interpretation, or real touch ergonomics. Record any exceptions and remediation before tagging the MVP release.
+### Deferred manual review — 2026-08-29
+
+The user explicitly chose to ship the source-only portfolio without VoiceOver/additional-screen-reader auditory review or physical-device ergonomics confirmation. These checks are optional follow-up work and are not release gates for `v1.0.0`. Automated semantics and visual emulation still do not prove announcement quality, interpreted reading order, or real touch ergonomics, so the release must not claim those forms of validation. If live public hosting is reconsidered, use [manual-accessibility-review.md](manual-accessibility-review.md) and record findings before making broader accessibility claims.

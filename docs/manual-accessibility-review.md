@@ -1,6 +1,6 @@
 # Manual accessibility review
 
-Use this checklist after the automated accessibility suite passes and before a public deployment or MVP release tag. Test only with the fictional demo identities documented in the README.
+This optional post-MVP checklist is retained for any future manual accessibility review. It was explicitly deferred for the GitHub-first `v1.0.0` release and is not part of that release's validation evidence. If the review is performed later, test only with the fictional demo identities documented in the README.
 
 ## Review environment
 
@@ -11,7 +11,7 @@ Record one row for each assistive-technology combination.
 |      |        | VoiceOver     | Safari  | macOS        | Korean  |        |
 |      |        |               |         |              | English |        |
 
-The first pass should use VoiceOver with Safari on macOS. The second pass must use a different screen-reader/browser combination, such as NVDA with Firefox or Chrome on Windows, or TalkBack with Chrome on Android.
+The first pass should use VoiceOver with Safari on macOS. A second pass should use a different screen-reader/browser combination, such as NVDA with Firefox or Chrome on Windows, or TalkBack with Chrome on Android.
 
 ## Screen-reader scenarios
 
@@ -47,4 +47,4 @@ The automated suite rejects visible interactive targets smaller than 24 CSS pixe
 | --- | ----------- | ----------------- | -------- | --------------- | --------------- | ---------- | ------ |
 |     |             |                   |          |                 |                 |            |        |
 
-Treat a blocked task, missing name or state, incorrect reading order, focus loss, or inaccessible required action as release-blocking. Record cosmetic verbosity or minor duplicate announcements separately, then retest every fixed finding with the same environment before marking the review complete.
+If a future release claims manual accessibility validation, treat a blocked task, missing name or state, incorrect reading order, focus loss, or inaccessible required action as release-blocking. Record cosmetic verbosity or minor duplicate announcements separately, then retest every fixed finding with the same environment before marking the review complete.

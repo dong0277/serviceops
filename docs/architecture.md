@@ -2,7 +2,7 @@
 
 ## Status
 
-The implemented local product workflows and Milestone 5 portfolio polish are complete. PostgreSQL persists the booking domain, status history, and immutable organization-scoped audit events. Customer, staff, and owner APIs enforce role and organization scope; the database atomically rejects overlapping active bookings. Owner booking results expose server-side search, filters, schedule sorting, and bounded pagination. Responsive Korean/English product surfaces consume the live APIs, while critical role journeys, WCAG 2.1 AA axe checks, keyboard-dialog checks, reflow, forced-colors, reduced-motion, and touch-target geometry run through Playwright against an isolated temporary Docker stack. Public deployment remains provisional and unvalidated.
+The implemented local product workflows and Milestone 5 portfolio polish are complete. PostgreSQL persists the booking domain, status history, and immutable organization-scoped audit events. Customer, staff, and owner APIs enforce role and organization scope; the database atomically rejects overlapping active bookings. Owner booking results expose server-side search, filters, schedule sorting, and bounded pagination. Responsive Korean/English product surfaces consume the live APIs, while critical role journeys, WCAG 2.1 AA axe checks, keyboard-dialog checks, reflow, forced-colors, reduced-motion, and touch-target geometry run through Playwright against an isolated temporary Docker stack. The `v1.0.0` portfolio is delivered through GitHub and the reproducible local stack, without a live deployment claim.
 
 ## Components
 
@@ -61,7 +61,7 @@ Expected failures use the shared `{ "error": { "code", "message", "details?" } }
 - `packages/tokens` owns stable semantic visual tokens shared by web surfaces.
 - Docker Compose is the reproducible local baseline; hosted services must not become required for tests.
 - Playwright owns critical browser-flow and automated accessibility coverage. Each E2E run uses an independent Compose project, PostgreSQL volume, ports, API origin allow-list, and public API build URL, then removes the temporary resources on exit. API integration tests remain the authority for concurrency, tenancy, and business-rule edge cases.
-- The provisional zero-cost public topology is Vercel Hobby for `apps/web` and `apps/api` plus Supabase Free for PostgreSQL only. It is not an implemented architecture until the deployment validation in ADR 005 passes.
+- GitHub, bilingual portfolio media, and the Docker Compose workflow are the accepted `v1.0.0` delivery architecture. Live hosting is optional post-MVP work and requires a new explicit decision under ADR 005.
 
 ## Health model
 
@@ -70,4 +70,4 @@ Expected failures use the shared `{ "error": { "code", "message", "details?" } }
 
 ## Decisions
 
-See `docs/adr/` for the monorepo, design system, authentication, database tenancy, booking conflict, and provisional deployment decisions.
+See `docs/adr/` for the monorepo, design system, authentication, database tenancy, booking conflict, and GitHub-first portfolio delivery decisions.
