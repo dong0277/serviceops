@@ -6,7 +6,7 @@ import {routing} from "@/i18n/routing";
 import "../globals.css";
 
 export const metadata: Metadata = {
-  title: "ServiceOps · Design Spike",
+  title: "ServiceOps · Booking and Operations",
   description: "Booking and operations for small field-service teams.",
 };
 
@@ -29,6 +29,12 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} data-scroll-behavior="smooth">
       <body>
+        <a
+          href="#main-content"
+          className="fixed top-3 left-3 z-[100] -translate-y-20 rounded-lg bg-ink px-4 py-2 text-sm font-bold text-white shadow-lg transition focus:translate-y-0"
+        >
+          {locale === "ko" ? "본문으로 건너뛰기" : "Skip to main content"}
+        </a>
         <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
       </body>
     </html>

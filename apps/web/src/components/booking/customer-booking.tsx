@@ -395,7 +395,7 @@ export function CustomerBooking() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+      <main id="main-content" className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
         <Link
           href="/"
           className="mb-7 inline-flex items-center gap-2 text-sm font-semibold text-muted hover:text-ink"
@@ -510,7 +510,7 @@ export function CustomerBooking() {
                       className={`flex min-w-[4.5rem] flex-col items-center rounded-2xl border px-3 py-3 transition ${selected ? "border-brand bg-brand text-white shadow-lg shadow-brand/15" : "border-line bg-white text-ink hover:border-brand/35"}`}
                     >
                       <span
-                        className={`text-[0.7rem] font-semibold ${selected ? "text-white/72" : "text-muted"}`}
+                        className={`text-[0.7rem] font-semibold ${selected ? "text-white" : "text-muted"}`}
                       >
                         {compactDateFormatter.format(date)}
                       </span>

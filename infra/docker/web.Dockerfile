@@ -15,6 +15,8 @@ RUN pnpm install --frozen-lockfile
 
 FROM dependencies AS builder
 WORKDIR /workspace
+ARG NEXT_PUBLIC_API_BASE_URL
+ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
 COPY apps/web apps/web
 COPY packages/tokens packages/tokens
 RUN pnpm --filter @serviceops/web build:webpack
@@ -36,4 +38,3 @@ USER nextjs
 EXPOSE 3000
 
 CMD ["node", "apps/web/server.js"]
-

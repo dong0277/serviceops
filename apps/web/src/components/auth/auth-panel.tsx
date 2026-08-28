@@ -242,7 +242,10 @@ export function AuthPanel() {
   }
 
   return (
-    <main className="surface-grid min-h-screen bg-[#f5f8f6] px-5 py-6 sm:px-8 sm:py-8">
+    <main
+      id="main-content"
+      className="surface-grid min-h-screen bg-[#f5f8f6] px-5 py-6 sm:px-8 sm:py-8"
+    >
       <div className="mx-auto max-w-5xl">
         <header className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 rounded-xl">
@@ -337,10 +340,15 @@ export function AuthPanel() {
               </section>
             ) : (
               <section aria-labelledby="auth-form-title">
-                <div className="flex rounded-xl bg-subtle p-1" aria-label={t("modeLabel")}>
+                <div
+                  className="flex rounded-xl bg-subtle p-1"
+                  role="group"
+                  aria-label={t("modeLabel")}
+                >
                   <button
                     type="button"
                     onClick={() => setMode("login")}
+                    aria-pressed={mode === "login"}
                     className={`h-10 flex-1 rounded-lg text-sm font-bold transition ${mode === "login" ? "bg-white text-ink shadow-sm" : "text-muted"}`}
                   >
                     {t("login")}
@@ -348,6 +356,7 @@ export function AuthPanel() {
                   <button
                     type="button"
                     onClick={() => setMode("register")}
+                    aria-pressed={mode === "register"}
                     className={`h-10 flex-1 rounded-lg text-sm font-bold transition ${mode === "register" ? "bg-white text-ink shadow-sm" : "text-muted"}`}
                   >
                     {t("register")}

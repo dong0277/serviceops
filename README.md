@@ -2,7 +2,7 @@
 
 ServiceOps is a web-based booking and operations platform for small field-service teams. It is being built as a production-quality public portfolio project: customers book available services, staff manage assigned work, and owners oversee schedules, people, reporting, and audit history from one organization-scoped system.
 
-> **Current status:** Milestone 3 complete. Staff assigned-work and status transitions, owner booking operations, customer and team directories, organization-scoped audit logs, and formula-safe filtered CSV export are implemented on top of the conflict-safe booking domain.
+> **Current status:** Milestone 4 is complete and Milestone 5 polish is underway. The responsive Korean/English customer, staff, and owner surfaces now include live dashboard metrics, a calendar-oriented booking view, service management, explicit interaction states, isolated Playwright flows, and an automated WCAG 2.1 AA accessibility baseline.
 
 ## Current preview
 
@@ -11,6 +11,8 @@ ServiceOps is a web-based booking and operations platform for small field-servic
 - Staff assigned work: `/ko/staff/bookings` and `/en/staff/bookings`
 - Owner customers, team, and audit log: `/ko/owner/customers`, `/ko/owner/team`, and `/ko/owner/audit` with equivalent `/en` routes
 - Owner dashboard: `/ko/owner/dashboard` and `/en/owner/dashboard`
+- Owner calendar: `/ko/owner/calendar` and `/en/owner/calendar`
+- Owner services: `/ko/owner/services` and `/en/owner/services`
 - Authentication: `/ko/login` and `/en/login`
 - FastAPI docs: `/docs`
 - API liveness: `/health`
@@ -36,15 +38,15 @@ See [architecture notes](docs/architecture.md) and the [architecture decisions](
 
 ## Technology baseline
 
-| Area         | Technology                                                       |
-| ------------ | ---------------------------------------------------------------- |
-| Web          | Next.js 16.3.3, React 19.2.8, TypeScript 6.0.3                   |
-| UI           | Tailwind CSS 4.3.3, Lucide React 1.34.0, Pretendard 1.3.9        |
-| Localization | next-intl 4.14.0; Korean default, English supported              |
-| API          | Python 3.12, FastAPI 0.141.1, SQLAlchemy 2.0.52, Alembic 1.19.1  |
-| Database     | PostgreSQL 17.11                                                 |
-| Tooling      | pnpm 11.19.0, uv 0.12.7 in containers, Ruff 0.16.5, pytest 9.1.1 |
-| Runtime      | Docker Compose and GitHub Actions                                |
+| Area         | Technology                                                                  |
+| ------------ | --------------------------------------------------------------------------- |
+| Web          | Next.js 16.3.3, React 19.2.8, TypeScript 6.0.3                              |
+| UI           | Tailwind CSS 4.3.3, Lucide React 1.34.0, Pretendard 1.3.9                   |
+| Localization | next-intl 4.14.0; Korean default, English supported                         |
+| API          | Python 3.12, FastAPI 0.141.1, SQLAlchemy 2.0.52, Alembic 1.19.1             |
+| Database     | PostgreSQL 17.11                                                            |
+| Tooling      | pnpm 11.19.0, Playwright 1.62.1, axe-core 4.13.0, Ruff 0.16.5, pytest 9.1.1 |
+| Runtime      | Docker Compose and GitHub Actions                                           |
 
 Exact JavaScript and Python transitive versions are recorded in `pnpm-lock.yaml` and `apps/api/uv.lock`.
 
@@ -100,11 +102,14 @@ make lint
 make type-check
 make test
 make build
+make e2e
 ```
 
 `make start` runs pending Alembic migrations before the API starts. `make migrate` can apply them explicitly, and `make seed` creates deterministic fictional identities, services, staff availability, time off, and bookings. The local demo owner is `owner@serviceops.test`, staff is `staff.hana@serviceops.test`, and customer is `customer.sora@serviceops.test`. All use password `ServiceOps-Demo-2026!`; never use these credentials outside local development.
 
-GitHub Actions runs frontend formatting, lint, strict type checking, backend tests, a production web build, and container builds without repository secrets.
+`make e2e` starts and seeds an isolated `serviceops-e2e` Docker project before exercising customer registration and booking, staff status progression, customer cancellation, owner service creation and booking filtering, owner-role isolation, and a mobile English localization/overflow smoke check in Chromium. Its temporary database volume is removed after both successful and failed runs, so the development database is not modified.
+
+GitHub Actions runs frontend formatting, lint, strict type checking, backend tests, a production web build, container builds, and the critical Playwright flows without repository secrets.
 
 ## Repository structure
 
@@ -116,6 +121,7 @@ packages/
 └── tokens/              # Shared semantic design tokens
 docs/
 ├── adr/                 # Architecture decision records
+├── accessibility.md
 ├── architecture.md
 ├── api.md
 ├── security.md
@@ -134,7 +140,7 @@ Makefile
 - Access and refresh credentials are opaque HttpOnly cookies; only their SHA-256 hashes are stored in PostgreSQL.
 - Cookie-authenticated mutations use an origin allow-list and CSRF cookie/header binding. Set `COOKIE_SECURE=true` for HTTPS deployment.
 - The process-local login limiter must be replaced or supplemented by shared infrastructure before multi-instance deployment.
-- The owner dashboard remains a fictional design-spike screen; customer booking, owner operations, and staff assigned-work screens use authorization-aware domain APIs.
+- Dashboard, calendar, customer booking, owner operations, and staff assigned-work screens use authorization-aware organization-scoped APIs; the underlying seeded identities and activity remain fictional.
 - Deployment and external account creation require explicit approval.
 
 ## Scope and non-goals
@@ -158,9 +164,9 @@ GitHub will be the synchronization point after the remote repository is explicit
 
 ## Roadmap
 
-1. Dashboard metrics, calendar-oriented views, and remaining responsive pages
-2. Browser end-to-end tests and accessibility review
-3. Approved public deployment, screenshots, demo recording, and case study
+1. Milestone 5 clean-checkout verification and manual assistive-technology review
+2. Approved public deployment, screenshots, demo recording, and case study
+3. MVP release tag after every acceptance criterion passes
 4. Post-MVP extraction of proven generic project patterns
 
 ## License

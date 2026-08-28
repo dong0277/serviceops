@@ -6,12 +6,14 @@ import {useState} from "react";
 import {BrandMark} from "@/components/brand-mark";
 import {LanguageSwitcher} from "@/components/language-switcher";
 import {Link, usePathname} from "@/i18n/navigation";
+import {useModalFocus} from "@/lib/use-modal-focus";
 
 export function StaffShell({children}: {children: React.ReactNode}) {
   const t = useTranslations("Staff");
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const active = pathname.startsWith("/staff/bookings");
+  const mobileNavigationRef = useModalFocus<HTMLElement>(mobileOpen, () => setMobileOpen(false));
 
   const navigation = (
     <nav aria-label={t("navigation")}>
@@ -33,14 +35,14 @@ export function StaffShell({children}: {children: React.ReactNode}) {
           <BrandMark inverse />
           <div>
             <p className="font-bold">ServiceOps</p>
-            <p className="text-[0.68rem] text-white/48">{t("workspace")}</p>
+            <p className="text-[0.68rem] text-white/75">{t("workspace")}</p>
           </div>
         </div>
         <div className="mt-5">{navigation}</div>
         <div className="mt-auto rounded-xl border border-white/8 bg-white/[0.055] p-3.5">
-          <p className="text-xs text-white/45">{t("signedInAs")}</p>
+          <p className="text-xs text-white/75">{t("signedInAs")}</p>
           <p className="mt-1 text-sm font-semibold">{t("demoStaff")}</p>
-          <p className="mt-0.5 truncate text-[0.68rem] text-white/45">staff.hana@serviceops.test</p>
+          <p className="mt-0.5 truncate text-[0.68rem] text-white/75">staff.hana@serviceops.test</p>
         </div>
       </aside>
       <div className="min-w-0">
@@ -60,7 +62,10 @@ export function StaffShell({children}: {children: React.ReactNode}) {
             <LanguageSwitcher compact />
           </div>
         </header>
-        <main className="mx-auto w-full max-w-[1320px] px-4 py-7 sm:px-6 lg:px-8 lg:py-9">
+        <main
+          id="main-content"
+          className="mx-auto w-full max-w-[1320px] px-4 py-7 sm:px-6 lg:px-8 lg:py-9"
+        >
           {children}
         </main>
       </div>
@@ -70,9 +75,17 @@ export function StaffShell({children}: {children: React.ReactNode}) {
             type="button"
             aria-label={t("closeOverlay")}
             onClick={() => setMobileOpen(false)}
+            tabIndex={-1}
             className="absolute inset-0 bg-black/35"
           />
-          <aside className="relative h-full w-[min(86vw,320px)] bg-[#102a24] p-4 text-white shadow-2xl">
+          <aside
+            ref={mobileNavigationRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label={t("navigation")}
+            tabIndex={-1}
+            className="relative h-full w-[min(86vw,320px)] bg-[#102a24] p-4 text-white shadow-2xl"
+          >
             <div className="mb-6 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <BrandMark inverse />

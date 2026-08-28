@@ -2,7 +2,7 @@
 
 ## Status and scope
 
-Milestone 3 implements password authentication, revocable browser sessions, CSRF protection, organization memberships, service and availability management, customer-owned booking operations, staff assigned-work transitions, owner operations, and organization-scoped audit logging. Password reset and production deployment controls belong to later milestones.
+Milestones 3 and 4 implement password authentication, revocable browser sessions, CSRF protection, organization memberships, service and availability management, customer-owned booking operations, staff assigned-work transitions, owner operations, organization-scoped audit logging, and the complete responsive role surfaces. The Milestone 5 quality pass keeps browser tests isolated from the development database. Password reset and production deployment controls belong to later work.
 
 ## Authentication design
 
@@ -22,6 +22,7 @@ Milestone 3 implements password authentication, revocable browser sessions, CSRF
 - Refresh and logout additionally require the readable `serviceops_csrf` cookie to match the `X-CSRF-Token` header and the hash stored with the session.
 - Requests without an `Origin` remain available to non-browser API clients. Browser deployment must keep the allow-list exact and use HTTPS.
 - Service, staff, availability, time-off, booking, rescheduling, and cancellation mutations reuse the same origin and CSRF checks.
+- Docker Compose injects the exact configured origin allow-list and cookie/session settings into the API container. The E2E target supplies test-only web and API origins instead of weakening origin validation.
 
 ## Authentication privacy and abuse controls
 
@@ -64,3 +65,5 @@ Remaining limitations:
 ## Local demo identities
 
 `make seed` is restricted to `development` and `test` environments. It creates fictional `.test` identities, three services, two staff profiles, weekly availability, time off, and mixed bookings using the local-only password `ServiceOps-Demo-2026!`. These credentials are intentionally public demo data and must never be enabled as production defaults.
+
+`make e2e` creates a separate test Compose project and temporary PostgreSQL volume, then removes both after the run. Browser-created test users and records therefore never enter the normal development database.

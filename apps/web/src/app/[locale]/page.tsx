@@ -21,7 +21,10 @@ export default async function PreviewHome() {
   const t = await getTranslations("Home");
 
   return (
-    <main className="surface-grid min-h-screen bg-[#f5f8f6] px-5 py-6 sm:px-8 sm:py-8">
+    <main
+      id="main-content"
+      className="surface-grid min-h-screen bg-[#f5f8f6] px-5 py-6 sm:px-8 sm:py-8"
+    >
       <div className="mx-auto max-w-6xl">
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-3">

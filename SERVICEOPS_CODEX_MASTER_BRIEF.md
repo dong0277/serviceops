@@ -1199,6 +1199,8 @@ Implementation record (2026-08-28): completed with staff-assigned booking list/d
 - Add dashboard metrics and calendar-oriented booking view.
 - Complete E2E tests.
 
+Implementation record (2026-08-28): completed with an owner-only organization-scoped dashboard aggregation API and responsive Korean/English dashboard, a filterable desktop month calendar with a mobile agenda and booking detail panel, live owner service creation/editing/deactivation/reactivation, completed loading/empty/success/authorization/failure states, keyboard dismissal and focus-visible treatment, and removal of non-functional owner navigation. Playwright now covers the five required cross-role flows against the seeded Docker stack—customer registration and booking, staff status progression, customer cancellation, owner service creation and booking filtering, and owner UI/API access denial for a customer—plus a mobile English localization and horizontal-overflow smoke check. Backend integration coverage is 21 tests, and CI runs the critical browser suite in addition to lint, type checking, builds, and container checks.
+
 ### Milestone 5: Portfolio polish
 
 - Resolve lint, type, test, accessibility, and build failures.
@@ -1206,6 +1208,8 @@ Implementation record (2026-08-28): completed with staff-assigned booking list/d
 - Add screenshots or a short demo capture when the UI is stable.
 - Verify setup from a clean checkout.
 - Tag a clear MVP release only after all acceptance criteria pass.
+
+Progress record (2026-08-28): completed the first quality slice with an automated WCAG 2.0/2.1 A/AA axe baseline across representative public, customer, staff, and owner routes; keyboard focus trapping, Escape dismissal, trigger focus restoration, skip links, accessible names, calendar date labels, and contrast corrections; and responsive overflow coverage. `make e2e` now builds and seeds a dedicated temporary Docker Compose project with isolated ports, origin configuration, and PostgreSQL volume, then removes all test resources on exit so the development database is not mutated. Accessibility scope and remaining manual assistive-technology checks are documented in `docs/accessibility.md`. Clean-checkout verification, stable UI captures, case-study completion, deployment approval, and the release tag remain open.
 
 ## 23. Acceptance Criteria
 

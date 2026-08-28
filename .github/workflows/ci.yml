@@ -79,6 +79,29 @@ jobs:
       - name: Test
         run: uv run --locked pytest
 
+  e2e:
+    name: Critical E2E flows
+    runs-on: ubuntu-latest
+    needs: [frontend, backend]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22.18.0
+          package-manager-cache: false
+      - name: Enable pnpm
+        run: |
+          corepack enable
+          corepack install --global pnpm@11.19.0
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Install Chromium
+        run: pnpm --filter @serviceops/web exec playwright install --with-deps chromium
+      - name: Prepare environment
+        run: cp .env.example .env
+      - name: Run critical flows
+        run: make e2e
+
   containers:
     name: Container builds
     runs-on: ubuntu-latest
