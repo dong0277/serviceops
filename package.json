@@ -1,0 +1,18 @@
+{
+  "name": "serviceops-platform",
+  "version": "0.0.0",
+  "private": true,
+  "packageManager": "pnpm@11.19.0",
+  "scripts": {
+    "dev": "pnpm --filter @serviceops/web dev",
+    "build": "pnpm --filter @serviceops/web build:webpack",
+    "build:turbopack": "pnpm --filter @serviceops/web build",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "pnpm --filter @serviceops/web lint && pnpm format:check",
+    "type-check": "pnpm --filter @serviceops/web type-check"
+  },
+  "devDependencies": {
+    "prettier": "3.9.6"
+  }
+}

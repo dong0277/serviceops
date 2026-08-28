@@ -1,0 +1,17 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+node_modules/
+.pnpm-store/
+.next/
+out/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+

@@ -1,0 +1,11 @@
+.DS_Store
+.next/
+.pnpm-store/
+.venv/
+node_modules/
+coverage/
+SERVICEOPS_CODEX_MASTER_BRIEF.md
+pnpm-lock.yaml
+apps/web/AGENTS.md
+apps/web/CLAUDE.md
+

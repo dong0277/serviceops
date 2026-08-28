@@ -1,0 +1,21 @@
+:root {
+  --so-color-ink: #14231f;
+  --so-color-ink-muted: #60706b;
+  --so-color-canvas: #f4f7f5;
+  --so-color-surface: #ffffff;
+  --so-color-surface-subtle: #eef3f0;
+  --so-color-line: #dfe8e3;
+  --so-color-brand: #117a64;
+  --so-color-brand-strong: #075f4d;
+  --so-color-brand-soft: #dff3ec;
+  --so-color-accent: #f1a73b;
+  --so-color-danger: #b83a3a;
+  --so-color-success: #167252;
+  --so-shadow-card: 0 1px 2px rgb(20 35 31 / 0.04), 0 12px 34px rgb(20 35 31 / 0.06);
+  --so-shadow-float: 0 18px 45px rgb(20 35 31 / 0.15);
+  --so-radius-sm: 0.625rem;
+  --so-radius-md: 0.875rem;
+  --so-radius-lg: 1.25rem;
+  --so-radius-xl: 1.75rem;
+  --so-focus-ring: 0 0 0 3px rgb(17 122 100 / 0.22);
+}

@@ -1,0 +1,24 @@
+name: Feature slice
+description: Propose a focused, reviewable ServiceOps change.
+title: "[Feature]: "
+labels: ["feature"]
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome
+      description: What user or operational outcome should change?
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List observable completion criteria and relevant negative cases.
+    validations:
+      required: true
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks and boundaries
+      description: Note security, tenancy, accessibility, localization, data, and explicit non-goals.
