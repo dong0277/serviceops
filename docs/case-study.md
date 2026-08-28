@@ -38,13 +38,13 @@ Critical browser flows create and mutate data, so running them against the norma
 
 ## Product views
 
-| Customer booking                                                           | Owner dashboard                                                               |
-| -------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| ![Korean mobile customer booking](screenshots/customer-booking-mobile.png) | ![Korean owner operations dashboard](screenshots/owner-dashboard-desktop.png) |
+| Customer booking                                                            | Owner dashboard                                                                |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| ![English mobile customer booking](screenshots/customer-booking-mobile.png) | ![English owner operations dashboard](screenshots/owner-dashboard-desktop.png) |
 
-| Owner calendar                                                           | Staff assigned work                                                         |
-| ------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
-| ![Korean owner booking calendar](screenshots/owner-calendar-desktop.png) | ![Korean mobile staff assigned work](screenshots/staff-bookings-mobile.png) |
+| Owner calendar                                                            | Staff assigned work                                                          |
+| ------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| ![English owner booking calendar](screenshots/owner-calendar-desktop.png) | ![English mobile staff assigned work](screenshots/staff-bookings-mobile.png) |
 
 The screenshots are generated from deterministic fictional seed data with `make portfolio-captures`.
 

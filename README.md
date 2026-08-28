@@ -22,9 +22,9 @@ All displayed names, email addresses, schedules, metrics, and prices are fiction
 
 ## Product views
 
-| Customer booking                                                                | Owner operations                                                                   |
-| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| ![Korean mobile customer booking](docs/screenshots/customer-booking-mobile.png) | ![Korean owner operations dashboard](docs/screenshots/owner-dashboard-desktop.png) |
+| Customer booking                                                                 | Owner operations                                                                    |
+| -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| ![English mobile customer booking](docs/screenshots/customer-booking-mobile.png) | ![English owner operations dashboard](docs/screenshots/owner-dashboard-desktop.png) |
 
 See the concise [ServiceOps case study](docs/case-study.md) for the product problem, architecture, implementation tradeoffs, security decisions, and testing strategy.
 
