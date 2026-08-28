@@ -10,16 +10,68 @@ if (!baseURL) {
   throw new Error("PORTFOLIO_BASE_URL is required.");
 }
 
+const locale = process.env.PORTFOLIO_LOCALE ?? "en";
+const variants = {
+  en: {
+    browserLocale: "en-US",
+    suffix: "",
+    signedIn: "You are signed in.",
+    accounts: {
+      customer: "Fill customer account",
+      owner: "Fill owner account",
+      staff: "Fill staff account",
+    },
+    home: "One clear flow from booking to field work",
+    booking: {
+      title: "How can we help?",
+      serviceGroup: "Choose a service",
+      service: /Home cleaning/,
+      dateGroup: "Visit date",
+      timeGroup: "Available times",
+      timeHeading: "Available times",
+      confirm: "Request this time",
+      confirmed: "We received your request",
+    },
+    staff: {title: "My assigned work", confirm: "Confirm", confirmed: "Confirmed"},
+    dashboard: "Operations dashboard",
+    calendar: "Booking calendar",
+  },
+  ko: {
+    browserLocale: "ko-KR",
+    suffix: "-ko",
+    signedIn: "로그인했습니다.",
+    accounts: {customer: "고객 계정 입력", owner: "오너 계정 입력", staff: "직원 계정 입력"},
+    home: "예약부터 현장 운영까지, 한 흐름으로",
+    booking: {
+      title: "어떤 도움이 필요하세요?",
+      serviceGroup: "서비스를 선택하세요",
+      service: /홈 클리닝/,
+      dateGroup: "방문 날짜",
+      timeGroup: "가능한 시간",
+      timeHeading: "가능한 시간",
+      confirm: "이 일정으로 예약 요청",
+      confirmed: "예약 요청을 받았어요",
+    },
+    staff: {title: "내 배정 업무", confirm: "예약 확정", confirmed: "확정"},
+    dashboard: "운영 대시보드",
+    calendar: "예약 캘린더",
+  },
+};
+const variant = variants[locale];
+if (!variant) {
+  throw new Error(`Unsupported PORTFOLIO_LOCALE: ${locale}. Use en or ko.`);
+}
+
 const outputDirectory = fileURLToPath(new URL("../../../docs/screenshots/", import.meta.url));
-const outputPath = join(outputDirectory, "serviceops-demo.gif");
-const framesDirectory = await mkdtemp(join(tmpdir(), "serviceops-demo-"));
+const outputPath = join(outputDirectory, `serviceops-demo${variant.suffix}.gif`);
+const framesDirectory = await mkdtemp(join(tmpdir(), `serviceops-demo-${locale}-`));
 await mkdir(outputDirectory, {recursive: true});
 
 const browser = await chromium.launch();
 const context = await browser.newContext({
   viewport: {width: 1280, height: 720},
   colorScheme: "light",
-  locale: "en-US",
+  locale: variant.browserLocale,
   timezoneId: "Asia/Seoul",
 });
 const page = await context.newPage();
@@ -38,10 +90,10 @@ async function capture(delay) {
 
 async function signIn(accountLabel) {
   await context.clearCookies();
-  await page.goto(`${baseURL}/en/login`);
+  await page.goto(`${baseURL}/${locale}/login`);
   await page.getByRole("button", {name: accountLabel}).click();
   await page.locator("form button[type='submit']").click();
-  await page.getByText("You are signed in.").waitFor();
+  await page.getByText(variant.signedIn).waitFor();
 }
 
 function createGif({width, colors}) {
@@ -75,25 +127,27 @@ function createGif({width, colors}) {
 }
 
 try {
-  await page.goto(`${baseURL}/en`);
-  await page.getByRole("heading", {name: "One clear flow from booking to field work"}).waitFor();
+  await page.goto(`${baseURL}/${locale}`);
+  await page.getByRole("heading", {name: variant.home}).waitFor();
   await waitForPage();
   await capture(90);
 
-  await signIn("Fill customer account");
-  await page.goto(`${baseURL}/en/booking`);
-  await page.getByRole("heading", {name: "How can we help?"}).waitFor();
-  const serviceGroup = page.getByRole("radiogroup", {name: "Choose a service"});
-  await serviceGroup.getByRole("radio", {name: /Home cleaning/}).click();
+  await signIn(variant.accounts.customer);
+  await page.goto(`${baseURL}/${locale}/booking`);
+  await page.getByRole("heading", {name: variant.booking.title}).waitFor();
+  const serviceGroup = page.getByRole("radiogroup", {name: variant.booking.serviceGroup});
+  await serviceGroup.getByRole("radio", {name: variant.booking.service}).click();
   await waitForPage();
   await capture(90);
 
-  const dateRadios = page.getByRole("radiogroup", {name: "Visit date"}).getByRole("radio");
+  const dateRadios = page
+    .getByRole("radiogroup", {name: variant.booking.dateGroup})
+    .getByRole("radio");
   let selectedSlot = false;
   for (let index = 0; index < (await dateRadios.count()); index += 1) {
     await dateRadios.nth(index).click();
     const availableSlots = page
-      .getByRole("radiogroup", {name: "Available times"})
+      .getByRole("radiogroup", {name: variant.booking.timeGroup})
       .getByRole("radio");
     if (await availableSlots.count()) {
       await availableSlots.first().click();
@@ -104,38 +158,42 @@ try {
   if (!selectedSlot) {
     throw new Error("No seeded booking slot was available for the demo.");
   }
-  await page.getByRole("heading", {name: "Available times"}).scrollIntoViewIfNeeded();
+  await page.getByRole("heading", {name: variant.booking.timeHeading}).scrollIntoViewIfNeeded();
   await capture(90);
 
-  await page.getByRole("button", {name: "Request this time"}).click();
-  const confirmation = page.getByText("We received your request");
+  await page.getByRole("button", {name: variant.booking.confirm}).click();
+  const confirmation = page.getByText(variant.booking.confirmed);
   await confirmation.waitFor();
   await confirmation.scrollIntoViewIfNeeded();
   await capture(120);
 
-  await signIn("Fill staff account");
-  await page.goto(`${baseURL}/en/staff/bookings`);
-  await page.getByRole("heading", {name: "My assigned work"}).waitFor();
+  await signIn(variant.accounts.staff);
+  await page.goto(`${baseURL}/${locale}/staff/bookings`);
+  await page.getByRole("heading", {name: variant.staff.title}).waitFor();
   await waitForPage();
   await capture(90);
   const staffBooking = page
     .locator("article")
-    .filter({has: page.getByRole("button", {name: "Confirm"})})
+    .filter({has: page.getByRole("button", {name: variant.staff.confirm})})
     .first();
   if (await staffBooking.isVisible()) {
-    await staffBooking.getByRole("button", {name: "Confirm"}).click();
-    await page.locator("article").getByText("Confirmed", {exact: true}).first().waitFor();
+    await staffBooking.getByRole("button", {name: variant.staff.confirm}).click();
+    await page
+      .locator("article")
+      .getByText(variant.staff.confirmed, {exact: true})
+      .first()
+      .waitFor();
     await capture(90);
   }
 
-  await signIn("Fill owner account");
-  await page.goto(`${baseURL}/en/owner/dashboard`);
-  await page.getByRole("heading", {name: "Operations dashboard"}).waitFor();
+  await signIn(variant.accounts.owner);
+  await page.goto(`${baseURL}/${locale}/owner/dashboard`);
+  await page.getByRole("heading", {name: variant.dashboard}).waitFor();
   await waitForPage();
   await capture(120);
 
-  await page.goto(`${baseURL}/en/owner/calendar`);
-  await page.getByRole("heading", {name: "Booking calendar"}).waitFor();
+  await page.goto(`${baseURL}/${locale}/owner/calendar`);
+  await page.getByRole("heading", {name: variant.calendar}).waitFor();
   await waitForPage();
   await capture(140);
 

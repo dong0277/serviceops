@@ -1,8 +1,10 @@
 # ServiceOps
 
+**English** | [한국어](README.ko.md)
+
 ServiceOps is a personal, non-commercial portfolio demo of a web-based booking and operations platform for small field-service teams. It demonstrates customers requesting available services, staff managing assigned work, and owners overseeing schedules, people, reporting, and audit history in one organization-scoped system.
 
-> **Current status:** The implemented local product workflows and Milestone 5 portfolio polish are complete. A clean checkout, 21 backend tests, 12 isolated Playwright flows, English screenshots, and the workflow GIF have been verified. The remaining release gates are a human screen-reader and physical-device review, an explicitly approved zero-cost deployment validation, a pagination decision for owner booking results, and the MVP release tag.
+> **Current status:** The implemented local product workflows and Milestone 5 portfolio polish are complete. A clean checkout, 21 backend tests, 12 isolated Playwright flows, bilingual screenshots, and English/Korean workflow GIFs have been verified. The remaining release gates are a human screen-reader and physical-device review, an explicitly approved zero-cost deployment validation, a pagination decision for owner booking results, and the MVP release tag.
 
 ## Implemented routes
 
@@ -127,7 +129,7 @@ make e2e
 
 GitHub Actions runs frontend formatting, lint, strict type checking, backend tests, a production web build, container builds, and the critical Playwright flows without repository secrets.
 
-The English portfolio assets are reproducible from isolated seeded Docker projects. `make portfolio-captures` refreshes the four screenshots. `make portfolio-demo` refreshes the GIF and additionally requires ImageMagick. Both commands remove their temporary database volumes on exit.
+The bilingual portfolio assets are reproducible from isolated seeded Docker projects. `make portfolio-captures` and `make portfolio-captures-ko` refresh the English and Korean screenshots. `make portfolio-demo` and `make portfolio-demo-ko` refresh the corresponding GIFs and additionally require ImageMagick. Every command removes its temporary database volume on exit.
 
 ## Repository structure
 
@@ -150,6 +152,8 @@ infra/docker/            # Web and API Dockerfiles
 .github/workflows/       # CI quality gates
 docker-compose.yml
 Makefile
+README.md
+README.ko.md
 ```
 
 ## Security notes

@@ -48,7 +48,7 @@ Critical browser flows create and mutate data, so running them against the norma
 | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | ![English owner booking calendar](screenshots/owner-calendar-desktop.png) | ![English mobile staff assigned work](screenshots/staff-bookings-mobile.png) |
 
-The screenshots are generated from deterministic fictional seed data with `make portfolio-captures`. The short workflow GIF is generated with `make portfolio-demo` and requires ImageMagick.
+The English screenshots are generated from deterministic fictional seed data with `make portfolio-captures`, and `make portfolio-captures-ko` creates the Korean variants used by `README.ko.md`. The corresponding short workflow GIFs come from `make portfolio-demo` and `make portfolio-demo-ko`; both GIF targets require ImageMagick.
 
 ## Testing strategy
 

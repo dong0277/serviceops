@@ -24,7 +24,7 @@ Do not silently change a decision. Record proposed changes as an ADR and ask for
 ### Current checkpoint — 2026-08-28
 
 - Milestones 0 through 4 were implemented in the local, reproducible environment; the documentation reconciliation later identified owner-booking pagination as a remaining Part B specification gap.
-- Milestone 5 local portfolio work is complete: clean-checkout verification, English screenshots and workflow GIF, case study, automated accessibility baseline, responsive/touch-target regression coverage, and non-commercial copy review.
+- Milestone 5 local portfolio work is complete: clean-checkout verification, reciprocal English/Korean READMEs, bilingual screenshots and workflow GIFs, case study, automated accessibility baseline, responsive/touch-target regression coverage, and non-commercial copy review.
 - The public repository is `dong0277/serviceops`, uses pnpm, is licensed under MIT, and is the synchronization point between the developer's two work locations.
 - No public deployment or ServiceOps-specific Vercel/Supabase project has been created. The provisional zero-cost topology remains Vercel Hobby for web/API plus Supabase Free for PostgreSQL only.
 - Release gates still open: VoiceOver and a second screen-reader auditory review, physical-device ergonomics confirmation, owner-booking pagination implementation or an explicit scope decision, approved deployment/domain security validation, and the MVP release tag.
@@ -137,6 +137,7 @@ serviceops/
 ├── .env.example
 ├── Makefile
 ├── README.md
+├── README.ko.md
 └── LICENSE
 ```
 
@@ -651,6 +652,7 @@ serviceops-platform/
 ├── .env.example
 ├── Makefile
 ├── README.md
+├── README.ko.md
 └── LICENSE
 ```
 
@@ -1113,9 +1115,9 @@ Cache dependencies where safe. The CI workflow must not require repository secre
 
 ## 21. Documentation for a Public Portfolio
 
-### README.md
+### README.md and README.ko.md
 
-The README should contain:
+The English README is the GitHub default and must link reciprocally to a complete Korean translation. Both README files should contain equivalent current information:
 
 - One-paragraph product description
 - Key capabilities
@@ -1233,6 +1235,8 @@ Demo capture record (2026-08-28): added a reproducible `make portfolio-demo` wor
 Non-commercial portfolio review record (2026-08-28): confirmed that the repository contains no personal contact solicitation, hiring CTA, advertising, affiliate link, donation request, payment integration, or real card flow. Reframed the project and case study as a personal, non-commercial engineering portfolio; added an explicit fictional-data/no-sale/no-fulfillment/no-payment notice to every Korean and English route and to page metadata; removed wording that implied real visits, price inquiries, public production registration, client acquisition, or freelance solicitation; and recorded the zero-recurring-cost deployment constraint. All four portfolio screenshots and the eight-frame GIF were regenerated from English routes. Formatting, lint, strict type checking, the production build, and all 12 isolated accessibility and critical-flow browser tests pass.
 
 Documentation reconciliation record (2026-08-28): reviewed every tracked project Markdown document against the repository, configuration, recent milestone records, and public non-commercial policy. Updated the README, architecture, API, security, accessibility, case study, design-spike history, and ADR status language; completed the required architecture flows and representative local API examples; corrected the manual review URL to the default port; recorded that public deployment is still uncreated and provisional; separated local seed identities from future resettable public-demo identities; and replaced completed milestone deferrals with their actual outcomes. The review also found that owner audit logs support bounded `limit`/`offset`, while owner booking results still lack the pagination required by Part B. Pagination must be implemented or explicitly deferred before the release tag.
+
+Bilingual portfolio record (2026-08-28): kept `README.md` as the English GitHub default, added the complete Korean `README.ko.md`, and connected them with reciprocal language links. Generalized the isolated portfolio capture scripts with a validated `PORTFOLIO_LOCALE` selector while preserving the existing English filenames. Added `make portfolio-captures-ko` and `make portfolio-demo-ko`, generated four Korean screenshots plus an eight-frame Korean workflow GIF under distinct `-ko` filenames, and linked those assets from the Korean README. The screenshots and representative GIF frames were visually checked for Korean content, clipping, and layout integrity.
 
 ## 23. Acceptance Criteria
 

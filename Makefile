@@ -1,6 +1,6 @@
 SHELL := /bin/sh
 
-.PHONY: setup install start stop logs dev-web dev-api lint format type-check test e2e portfolio-captures portfolio-demo build migrate seed
+.PHONY: setup install start stop logs dev-web dev-api lint format type-check test e2e portfolio-captures portfolio-captures-ko portfolio-demo portfolio-demo-ko build migrate seed
 
 setup:
 	@test -f .env || cp .env.example .env
@@ -81,6 +81,9 @@ portfolio-captures:
 	docker compose -p "$$project" exec -T api /app/.venv/bin/python -m app.seed; \
 	PORTFOLIO_BASE_URL="http://127.0.0.1:$$web_port" pnpm --filter @serviceops/web capture:portfolio
 
+portfolio-captures-ko:
+	PORTFOLIO_LOCALE=ko $(MAKE) portfolio-captures
+
 portfolio-demo:
 	@set -eu; \
 	command -v magick >/dev/null || { echo "ImageMagick is required (brew install imagemagick)."; exit 1; }; \
@@ -96,6 +99,9 @@ portfolio-demo:
 	docker compose -p "$$project" up --build -d --wait; \
 	docker compose -p "$$project" exec -T api /app/.venv/bin/python -m app.seed; \
 	PORTFOLIO_BASE_URL="http://127.0.0.1:$$web_port" pnpm --filter @serviceops/web capture:demo
+
+portfolio-demo-ko:
+	PORTFOLIO_LOCALE=ko $(MAKE) portfolio-demo
 
 build:
 	pnpm build
