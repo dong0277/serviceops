@@ -265,7 +265,7 @@ export function Dashboard() {
               <p className="mt-2 text-sm text-muted">{t("emptyBody")}</p>
               <Link
                 href="/owner/calendar"
-                className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-brand"
+                className="mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-brand"
               >
                 {t("openCalendar")} <ArrowRight className="size-4" />
               </Link>
@@ -281,7 +281,7 @@ export function Dashboard() {
             </div>
           )}
 
-          <Card className="relative overflow-hidden border-0 bg-[#163c33] p-6 text-white shadow-[var(--so-shadow-float)] sm:p-7">
+          <section className="relative overflow-hidden rounded-[var(--so-radius-lg)] bg-[#163c33] p-6 text-white shadow-[var(--so-shadow-float)] sm:p-7">
             <div className="absolute -top-14 -right-10 size-44 rounded-full bg-white/[0.055]" />
             <span className="flex size-10 items-center justify-center rounded-xl bg-white/10 text-[#8de0c6]">
               <Sparkles className="size-5" />
@@ -294,11 +294,11 @@ export function Dashboard() {
             </p>
             <Link
               href="/owner/calendar"
-              className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-white underline decoration-white/50 underline-offset-4"
+              className="mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-white underline decoration-white/50 underline-offset-4"
             >
               {t("reviewSchedule")} <ArrowRight className="size-4" />
             </Link>
-          </Card>
+          </section>
 
           <p className="text-right text-[0.7rem] text-muted">{dashboard.timezone} · UTC+09:00</p>
         </>
@@ -355,7 +355,7 @@ function TodaySchedule({
         </div>
         <Link
           href="/owner/calendar"
-          className="inline-flex items-center gap-1 text-xs font-bold text-brand"
+          className="-my-2 inline-flex min-h-11 items-center gap-1 text-xs font-bold text-brand"
         >
           {t("viewCalendar")} <ArrowRight className="size-3.5" />
         </Link>

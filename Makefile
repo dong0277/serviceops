@@ -1,6 +1,6 @@
 SHELL := /bin/sh
 
-.PHONY: setup install start stop logs dev-web dev-api lint format type-check test e2e build migrate seed
+.PHONY: setup install start stop logs dev-web dev-api lint format type-check test e2e portfolio-captures build migrate seed
 
 setup:
 	@test -f .env || cp .env.example .env
@@ -40,9 +40,13 @@ type-check:
 	pnpm type-check
 
 test:
-	docker compose --profile test up -d --wait postgres-test
-	cd apps/api && TEST_DATABASE_URL=postgresql+psycopg://serviceops_test:serviceops-test-only@127.0.0.1:$${TEST_POSTGRES_PORT:-5433}/serviceops_test uv run --locked pytest
-	docker compose --profile test stop postgres-test
+	@set -eu; \
+	cleanup() { docker compose --profile test stop postgres-test >/dev/null 2>&1 || true; }; \
+	trap cleanup EXIT HUP INT TERM; \
+	docker compose --profile test up -d --wait postgres-test; \
+	test_postgres_binding=$$(docker compose --profile test port postgres-test 5432); \
+	test_postgres_port=$${test_postgres_binding##*:}; \
+	(cd apps/api && TEST_DATABASE_URL="postgresql+psycopg://serviceops_test:serviceops-test-only@127.0.0.1:$$test_postgres_port/serviceops_test" uv run --locked pytest)
 
 e2e:
 	@set -eu; \
@@ -61,6 +65,21 @@ e2e:
 	E2E_BASE_URL="http://127.0.0.1:$$web_port" E2E_API_URL="http://127.0.0.1:$$api_port" pnpm --filter @serviceops/web e2e || status=$$?; \
 	if [ "$$status" -ne 0 ]; then docker compose -p "$$project" logs --no-color; fi; \
 	exit "$$status"
+
+portfolio-captures:
+	@set -eu; \
+	project=serviceops-portfolio; \
+	web_port=$${PORTFOLIO_WEB_PORT:-13010}; \
+	api_port=$${PORTFOLIO_API_PORT:-18010}; \
+	postgres_port=$${PORTFOLIO_POSTGRES_PORT:-15440}; \
+	cleanup() { docker compose -p "$$project" down -v --remove-orphans >/dev/null; }; \
+	trap cleanup EXIT HUP INT TERM; \
+	export WEB_PORT="$$web_port" API_PORT="$$api_port" POSTGRES_PORT="$$postgres_port"; \
+	export CORS_ALLOWED_ORIGINS="http://127.0.0.1:$$web_port,http://127.0.0.1:$$api_port"; \
+	export NEXT_PUBLIC_API_BASE_URL="http://127.0.0.1:$$api_port"; \
+	docker compose -p "$$project" up --build -d --wait; \
+	docker compose -p "$$project" exec -T api /app/.venv/bin/python -m app.seed; \
+	PORTFOLIO_BASE_URL="http://127.0.0.1:$$web_port" pnpm --filter @serviceops/web capture:portfolio
 
 build:
 	pnpm build

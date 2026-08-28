@@ -20,6 +20,14 @@ ServiceOps is a web-based booking and operations platform for small field-servic
 
 All displayed names, email addresses, schedules, metrics, and prices are fictional demo data persisted by `make seed`. The displayed prices are non-billing information and no payment is collected.
 
+## Product views
+
+| Customer booking                                                                | Owner operations                                                                   |
+| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| ![Korean mobile customer booking](docs/screenshots/customer-booking-mobile.png) | ![Korean owner operations dashboard](docs/screenshots/owner-dashboard-desktop.png) |
+
+See the concise [ServiceOps case study](docs/case-study.md) for the product problem, architecture, implementation tradeoffs, security decisions, and testing strategy.
+
 ## Architecture
 
 ```mermaid
@@ -109,6 +117,8 @@ make e2e
 
 `make e2e` starts and seeds an isolated `serviceops-e2e` Docker project before exercising customer registration and booking, staff status progression, customer cancellation, owner service creation and booking filtering, owner-role isolation, and a mobile English localization/overflow smoke check in Chromium. Its temporary database volume is removed after both successful and failed runs, so the development database is not modified.
 
+`make test` connects to the host port that Docker actually publishes for `postgres-test`, so changing `TEST_POSTGRES_PORT` in `.env` or for a single command does not require a second database URL override. The test container is stopped after both successful and failed runs.
+
 GitHub Actions runs frontend formatting, lint, strict type checking, backend tests, a production web build, container builds, and the critical Playwright flows without repository secrets.
 
 ## Repository structure
@@ -122,8 +132,10 @@ packages/
 docs/
 ├── adr/                 # Architecture decision records
 ├── accessibility.md
+├── manual-accessibility-review.md
 ├── architecture.md
 ├── api.md
+├── case-study.md
 ├── security.md
 └── design-spike.md
 infra/docker/            # Web and API Dockerfiles
@@ -164,8 +176,8 @@ GitHub will be the synchronization point after the remote repository is explicit
 
 ## Roadmap
 
-1. Milestone 5 clean-checkout verification and manual assistive-technology review
-2. Approved public deployment, screenshots, demo recording, and case study
+1. Milestone 5 human screen-reader and physical touch-target review
+2. Approved public deployment and final domain security validation
 3. MVP release tag after every acceptance criterion passes
 4. Post-MVP extraction of proven generic project patterns
 

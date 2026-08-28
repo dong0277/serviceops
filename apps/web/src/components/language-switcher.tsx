@@ -23,7 +23,7 @@ export function LanguageSwitcher({compact = false}: {compact?: boolean}) {
         aria-label={t("language")}
         value={locale}
         onChange={(event) => changeLocale(event.target.value as AppLocale)}
-        className="cursor-pointer bg-transparent pr-1 text-sm font-semibold text-ink"
+        className="min-h-10 cursor-pointer bg-transparent px-1 text-sm font-semibold text-ink"
       >
         <option value="ko">{t("korean")}</option>
         <option value="en">{t("english")}</option>

@@ -12,6 +12,7 @@ ServiceOps targets WCAG 2.1 Level AA for the public booking, authentication, cus
 - Focus-visible treatments are shared across customer and operations profiles.
 - Korean remains the default locale and English remains available through locale-prefixed routes.
 - Responsive smoke coverage uses a 390 × 844 viewport and rejects horizontal page overflow.
+- Representative mobile customer, staff, and owner routes reject visible interactive targets smaller than 24 CSS pixels.
 
 ## Automated coverage
 
@@ -25,4 +26,16 @@ E2E_WEB_PORT=13001 E2E_API_PORT=18001 E2E_POSTGRES_PORT=15433 make e2e
 
 ## Remaining manual checks
 
-Before a public release, verify the stable deployed build with VoiceOver and at least one additional screen reader/browser combination, browser zoom at 200%, reduced-motion preferences, forced-colors/high-contrast mode, and representative touch targets. Record any exceptions and remediation before tagging the MVP release.
+### Environment-assisted review — 2026-08-28
+
+| Check                                    | Result | Evidence                                                                                                                         |
+| ---------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| Keyboard order and skip link             | Pass   | Real-browser review plus Playwright dialog and mobile-drawer focus tests                                                         |
+| Dialog focus containment and restoration | Pass   | `Tab`, `Shift+Tab`, `Escape`, initial focus, and trigger restoration coverage                                                    |
+| 200%-equivalent reflow                   | Pass   | Owner dashboard, calendar, and services checked at a 640 CSS-pixel viewport with no horizontal document overflow                 |
+| Reduced motion                           | Pass   | Entry animation runs only with `no-preference`; smooth scrolling and transition/animation duration are suppressed under `reduce` |
+| Forced colors                            | Pass   | Key owner pages render under forced colors and focus-visible controls receive a system-color outline                             |
+| Representative mobile layout             | Pass   | Customer booking and staff assigned-work views reviewed at 390 × 844 and captured without horizontal overflow                    |
+| Minimum touch-target geometry            | Pass   | Representative customer, staff, and owner pages reject visible interactive targets below 24 CSS pixels at 390 × 844              |
+
+Before a public release, complete the procedures in [manual-accessibility-review.md](manual-accessibility-review.md): perform an auditory review with VoiceOver and at least one additional screen-reader/browser combination, then confirm representative touch targets on the intended physical devices. Automated semantics and visual emulation do not validate announcement quality, reading order interpretation, or real touch ergonomics. Record any exceptions and remediation before tagging the MVP release.

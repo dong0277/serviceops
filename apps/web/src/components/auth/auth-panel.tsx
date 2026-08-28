@@ -244,6 +244,7 @@ export function AuthPanel() {
   return (
     <main
       id="main-content"
+      tabIndex={-1}
       className="surface-grid min-h-screen bg-[#f5f8f6] px-5 py-6 sm:px-8 sm:py-8"
     >
       <div className="mx-auto max-w-5xl">

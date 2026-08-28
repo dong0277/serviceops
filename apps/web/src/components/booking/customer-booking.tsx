@@ -395,10 +395,14 @@ export function CustomerBooking() {
         </div>
       </header>
 
-      <main id="main-content" className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12"
+      >
         <Link
           href="/"
-          className="mb-7 inline-flex items-center gap-2 text-sm font-semibold text-muted hover:text-ink"
+          className="-ml-2 mb-5 inline-flex min-h-11 items-center gap-2 px-2 text-sm font-semibold text-muted hover:text-ink"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />
           {common("preview")}
@@ -658,7 +662,10 @@ export function CustomerBooking() {
           {authenticated === false ? (
             <div className="p-8 text-center">
               <p className="text-sm text-muted">{t("loginRequired")}</p>
-              <Link href="/login" className="mt-3 inline-flex text-sm font-bold text-brand">
+              <Link
+                href="/login"
+                className="mt-1 inline-flex min-h-11 items-center px-2 text-sm font-bold text-brand"
+              >
                 {t("goToLogin")}
               </Link>
             </div>
