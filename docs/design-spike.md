@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document records the historical Phase 0C spike that validated one thin design system across a comfortable mobile customer flow and a compact desktop operations flow. The spike originally used static fictional data. As of Milestone 4, its customer, booking-list, and dashboard concepts have been connected to the local API and PostgreSQL; the seeded content remains fictional demo data.
+This document records the historical Phase 0C spike that validated one thin design system across a comfortable mobile customer flow and a compact desktop operations flow. The spike originally used static fictional data. The current local product connects those customer, booking-list, and dashboard concepts to FastAPI and PostgreSQL; the seeded content remains fictional demo data.
 
 ## Screens
 
@@ -24,13 +24,13 @@ The localized preview index is available at `/ko` and `/en`.
 - Visible focus states, semantic headings, labels, radio groups, status regions, table markup, and progress-bar semantics
 - Reduced-motion preference support
 
-## Deliberately deferred components
+## Historical deferrals and outcomes
 
-- Full Calendar: the current customer flow uses a short date strip and calculated slots; a calendar-oriented operations view remains Milestone 3 work.
-- Dialog: no spike interaction requires a blocking modal.
-- Toast: the booking request uses an inline live status so the confirmation remains visible and accessible.
-- Reusable DataTable abstraction: only one table exists; extract it after a second real use proves the API.
-- Production navigation destinations: sidebar destinations outside the three spike screens remain non-functional and must not ship as final MVP navigation.
+- Full calendar: the customer flow intentionally retains a short date strip and calculated slots; Milestone 4 added the owner desktop month grid and mobile agenda.
+- Dialog: later owner booking-detail and service-management interactions added accessible modal dialogs with focus trapping, Escape dismissal, scroll locking, and trigger focus restoration.
+- Toast: the booking request still uses an inline live status so confirmation remains visible and accessible.
+- Reusable DataTable abstraction: the MVP keeps purpose-built tables and lists because their data and responsive behavior differ; extraction remains post-MVP work only if another project proves a stable shared API.
+- Production navigation: Milestone 4 removed non-functional destinations and retained only implemented routes.
 
 ## Review questions
 
@@ -56,4 +56,4 @@ Validated on 2026-08-28:
 - Korean and English dashboard layouts had no horizontal overflow at the tested viewports.
 - The final browser pass contained no console warnings or errors.
 
-The Turbopack production build could not be exercised in the Codex execution sandbox because its CSS worker attempted to bind an internal port that the environment denied. The repository therefore uses the successful Webpack production build as its Milestone 0 quality gate. Re-evaluate Turbopack in a normal local terminal during Milestone 1 before changing that gate.
+The Turbopack production build could not be exercised in the Codex execution sandbox because its CSS worker attempted to bind an internal port that the environment denied. The verified Webpack production build remains the repository quality gate. Turbopack is an optional post-MVP evaluation and must not replace that gate without a successful local and CI comparison.

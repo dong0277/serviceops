@@ -2,9 +2,9 @@
 
 ServiceOps is a personal, non-commercial portfolio demo of a web-based booking and operations platform for small field-service teams. It demonstrates customers requesting available services, staff managing assigned work, and owners overseeing schedules, people, reporting, and audit history in one organization-scoped system.
 
-> **Current status:** Milestone 4 is complete and Milestone 5 polish is underway. The responsive Korean/English customer, staff, and owner surfaces now include live dashboard metrics, a calendar-oriented booking view, service management, explicit interaction states, isolated Playwright flows, and an automated WCAG 2.1 AA accessibility baseline.
+> **Current status:** The implemented local product workflows and Milestone 5 portfolio polish are complete. A clean checkout, 21 backend tests, 12 isolated Playwright flows, English screenshots, and the workflow GIF have been verified. The remaining release gates are a human screen-reader and physical-device review, an explicitly approved zero-cost deployment validation, a pagination decision for owner booking results, and the MVP release tag.
 
-## Current preview
+## Implemented routes
 
 - Customer mobile booking: `/ko/booking` and `/en/booking`
 - Owner booking list: `/ko/owner/bookings` and `/en/owner/bookings`
@@ -28,6 +28,10 @@ All displayed names, email addresses, schedules, metrics, and prices are fiction
 | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
 | ![English mobile customer booking](docs/screenshots/customer-booking-mobile.png) | ![English owner operations dashboard](docs/screenshots/owner-dashboard-desktop.png) |
 
+| Owner calendar                                                         | Staff assigned work                                                      |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| ![English owner calendar](docs/screenshots/owner-calendar-desktop.png) | ![English mobile staff work](docs/screenshots/staff-bookings-mobile.png) |
+
 See the concise [ServiceOps case study](docs/case-study.md) for the product problem, architecture, implementation tradeoffs, security decisions, and testing strategy.
 
 ## Architecture
@@ -42,7 +46,7 @@ flowchart LR
     GitHub --> Containers[Container builds]
 ```
 
-The repository is a simple monorepo. A single Next.js application contains public, customer, staff, and owner surfaces. FastAPI remains the authority for authentication, authorization, tenancy, and booking rules. PostgreSQL runs locally through Docker Compose; the provisional zero-cost public-demo target uses Supabase Free as a managed database only.
+The repository is a simple monorepo. A single Next.js application contains public, customer, staff, and owner surfaces. FastAPI remains the authority for authentication, authorization, tenancy, and booking rules. PostgreSQL runs locally through Docker Compose. The provisional zero-cost public-demo topology is Vercel Hobby for the web and API plus Supabase Free for managed PostgreSQL; it has not been deployed or validated yet.
 
 See [architecture notes](docs/architecture.md) and the [architecture decisions](docs/adr/) for details.
 
@@ -115,13 +119,15 @@ make build
 make e2e
 ```
 
-`make start` runs pending Alembic migrations before the API starts. `make migrate` can apply them explicitly, and `make seed` creates deterministic fictional identities, services, staff availability, time off, and bookings. The local demo owner is `owner@serviceops.test`, staff is `staff.hana@serviceops.test`, and customer is `customer.sora@serviceops.test`. All use password `ServiceOps-Demo-2026!`; never use these credentials outside local development.
+`make start` runs pending Alembic migrations before the API starts. `make migrate` can apply them explicitly, and `make seed` creates deterministic fictional identities, services, staff availability, time off, and bookings. The local demo owner is `owner@serviceops.test`, staff is `staff.hana@serviceops.test`, and customer is `customer.sora@serviceops.test`. All use password `ServiceOps-Demo-2026!`. These are local-only seed credentials; a public deployment must use separately provisioned, resettable fictional identities and must never enable this password as a deployment default.
 
 `make e2e` starts and seeds an isolated `serviceops-e2e` Docker project before exercising customer registration and booking, staff status progression, customer cancellation, owner service creation and booking filtering, owner-role isolation, and a mobile English localization/overflow smoke check in Chromium. Its temporary database volume is removed after both successful and failed runs, so the development database is not modified.
 
 `make test` connects to the host port that Docker actually publishes for `postgres-test`, so changing `TEST_POSTGRES_PORT` in `.env` or for a single command does not require a second database URL override. The test container is stopped after both successful and failed runs.
 
 GitHub Actions runs frontend formatting, lint, strict type checking, backend tests, a production web build, container builds, and the critical Playwright flows without repository secrets.
+
+The English portfolio assets are reproducible from isolated seeded Docker projects. `make portfolio-captures` refreshes the four screenshots. `make portfolio-demo` refreshes the GIF and additionally requires ImageMagick. Both commands remove their temporary database volumes on exit.
 
 ## Repository structure
 
@@ -149,14 +155,14 @@ Makefile
 ## Security notes
 
 - No real customer, payment, or personal data is used.
-- The public site is a personal, non-commercial software demo; it does not advertise or fulfill real services.
+- The project and any future public site are a personal, non-commercial software demo; they do not advertise or fulfill real services.
 - Local ports bind to `127.0.0.1` by default.
 - Secrets belong in the ignored `.env` file; `.env.example` contains placeholders only.
 - Access and refresh credentials are opaque HttpOnly cookies; only their SHA-256 hashes are stored in PostgreSQL.
 - Cookie-authenticated mutations use an origin allow-list and CSRF cookie/header binding. Set `COOKIE_SECURE=true` for HTTPS deployment.
 - The process-local login limiter must be replaced or supplemented by shared infrastructure before multi-instance deployment.
 - Dashboard, calendar, customer booking, owner operations, and staff assigned-work screens use authorization-aware organization-scoped APIs; the underlying seeded identities and activity remain fictional.
-- Deployment and external account creation require explicit approval.
+- No public deployment has been created. Deployment and external account creation require explicit approval.
 
 ## Scope and non-goals
 
@@ -171,18 +177,19 @@ It deliberately excludes real payments, real customer data, chat, AI product fea
 - Locale-prefixed routes make a later switch from Korean-default to English-default predictable.
 - FastAPI owns business rules and authorization instead of delegating them to generated database APIs.
 - Local Docker reproducibility takes priority over hosted-provider convenience.
-- The stable Webpack production build is the repository quality gate while the environment-specific Turbopack CSS worker limitation is re-evaluated during Milestone 0/1.
+- The stable Webpack production build is the repository quality gate. Turbopack remains an optional post-MVP evaluation because its environment-specific CSS worker limitation does not block the verified build path.
 
 ## Two-location workflow
 
-GitHub will be the synchronization point after the remote repository is explicitly approved and created. Before moving between work locations, commit and push the active branch. Local stashes, `.env` files, dependencies, and Docker volumes do not move between computers; recreate them from the tracked lockfiles, migrations, seed commands, and setup documentation.
+The public [GitHub repository](https://github.com/dong0277/serviceops) is the synchronization point between work locations. Before moving between locations, commit and push the active branch. Local stashes, `.env` files, dependencies, and Docker volumes do not move between computers; recreate them from the tracked lockfiles, migrations, seed commands, and setup documentation.
 
 ## Roadmap
 
-1. Milestone 5 human screen-reader and physical touch-target review
-2. Approved public deployment and final domain security validation
-3. MVP release tag after every acceptance criterion passes
-4. Post-MVP extraction of proven generic project patterns
+1. VoiceOver plus a second screen-reader auditory review and physical-device ergonomics confirmation
+2. Decide whether to implement owner-booking pagination for the MVP or explicitly defer it
+3. Approved zero-cost public deployment and final cookie, CORS, CSRF, domain, and rate-limit validation
+4. MVP release tag after every acceptance criterion passes
+5. Post-MVP extraction of proven generic project patterns
 
 ## License
 

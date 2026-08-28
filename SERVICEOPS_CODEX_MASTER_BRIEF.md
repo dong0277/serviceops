@@ -21,6 +21,15 @@ When instructions conflict, follow this priority:
 
 Do not silently change a decision. Record proposed changes as an ADR and ask for approval when the change affects scope, architecture, hosting cost, authentication, or production data.
 
+### Current checkpoint — 2026-08-28
+
+- Milestones 0 through 4 were implemented in the local, reproducible environment; the documentation reconciliation later identified owner-booking pagination as a remaining Part B specification gap.
+- Milestone 5 local portfolio work is complete: clean-checkout verification, English screenshots and workflow GIF, case study, automated accessibility baseline, responsive/touch-target regression coverage, and non-commercial copy review.
+- The public repository is `dong0277/serviceops`, uses pnpm, is licensed under MIT, and is the synchronization point between the developer's two work locations.
+- No public deployment or ServiceOps-specific Vercel/Supabase project has been created. The provisional zero-cost topology remains Vercel Hobby for web/API plus Supabase Free for PostgreSQL only.
+- Release gates still open: VoiceOver and a second screen-reader auditory review, physical-device ergonomics confirmation, owner-booking pagination implementation or an explicit scope decision, approved deployment/domain security validation, and the MVP release tag.
+- Historical progress records below describe the state at the time of each milestone and do not override this checkpoint.
+
 ---
 
 # Part A. Strategy and Current Decisions
@@ -99,24 +108,25 @@ The final portfolio should include:
 
 Use one GitHub monorepo for ServiceOps.
 
-Initial structure:
+Implemented structure:
 
 ```text
-serviceops-platform/
+serviceops/
 ├── apps/
 │   ├── web/                  # Next.js application
 │   └── api/                  # FastAPI application
 ├── packages/
-│   ├── tokens/               # Semantic design tokens
-│   ├── ui/                   # Shared web UI components and patterns
-│   └── config/               # Shared frontend configuration if justified
+│   └── tokens/               # Semantic design tokens
 ├── docs/
 │   ├── adr/
+│   ├── accessibility.md
+│   ├── manual-accessibility-review.md
 │   ├── architecture.md
 │   ├── api.md
-│   ├── design-system.md
+│   ├── design-spike.md
 │   ├── security.md
-│   └── case-study.md
+│   ├── case-study.md
+│   └── screenshots/
 ├── infra/
 │   └── docker/
 ├── .github/
@@ -126,14 +136,13 @@ serviceops-platform/
 ├── docker-compose.yml
 ├── .env.example
 ├── Makefile
-├── AGENTS.md
 ├── README.md
 └── LICENSE
 ```
 
 Keep the monorepo simple. Do not add Turborepo, Nx, or another orchestration framework unless normal package-manager workspaces and the Makefile are demonstrably insufficient.
 
-The current working directory is the repository root; do not create another nested `serviceops-platform/` directory. Initialize it as a new Git repository and connect it to a repository owned by the developer's personal GitHub account only when explicitly approved.
+The current working directory is the repository root; do not create another nested `serviceops-platform/` directory. It is the approved public Git repository owned by the developer's personal GitHub account at `https://github.com/dong0277/serviceops`.
 
 Development occurs from two work locations. GitHub is the synchronization point for source code and documentation. Work that must move between locations must be committed and pushed to a branch; local stashes, `.env` files, database volumes, secrets, and build outputs must not be treated as portable project state. Both environments must be reproducible from tracked migrations, seed data, lockfiles, and documented setup commands.
 
@@ -206,7 +215,7 @@ GitHub monorepo
 └── Supabase Free project: PostgreSQL only
 ```
 
-This remains provisional until a working vertical slice is deployed and the zero-cost limits are validated. Use the provider domains initially and do not purchase a custom domain. If Vercel Functions, free-tier terms, or database suspension create a real technical problem, document the evidence in an ADR and propose another zero-cost host. Do not switch hosting providers silently.
+This remains provisional until an approved working vertical slice is deployed and the zero-cost limits are validated. No ServiceOps-specific Vercel or Supabase project exists yet. Use the provider domains initially and do not purchase a custom domain. If Vercel Functions, free-tier terms, or database suspension create a real technical problem, document the evidence in an ADR and propose another zero-cost host. Do not switch hosting providers silently.
 
 Normal test and build workflows must not depend on production credentials.
 
@@ -1223,6 +1232,8 @@ Demo capture record (2026-08-28): added a reproducible `make portfolio-demo` wor
 
 Non-commercial portfolio review record (2026-08-28): confirmed that the repository contains no personal contact solicitation, hiring CTA, advertising, affiliate link, donation request, payment integration, or real card flow. Reframed the project and case study as a personal, non-commercial engineering portfolio; added an explicit fictional-data/no-sale/no-fulfillment/no-payment notice to every Korean and English route and to page metadata; removed wording that implied real visits, price inquiries, public production registration, client acquisition, or freelance solicitation; and recorded the zero-recurring-cost deployment constraint. All four portfolio screenshots and the eight-frame GIF were regenerated from English routes. Formatting, lint, strict type checking, the production build, and all 12 isolated accessibility and critical-flow browser tests pass.
 
+Documentation reconciliation record (2026-08-28): reviewed every tracked project Markdown document against the repository, configuration, recent milestone records, and public non-commercial policy. Updated the README, architecture, API, security, accessibility, case study, design-spike history, and ADR status language; completed the required architecture flows and representative local API examples; corrected the manual review URL to the default port; recorded that public deployment is still uncreated and provisional; separated local seed identities from future resettable public-demo identities; and replaced completed milestone deferrals with their actual outcomes. The review also found that owner audit logs support bounded `limit`/`offset`, while owner booking results still lack the pagination required by Part B. Pagination must be implemented or explicitly deferred before the release tag.
+
 ## 23. Acceptance Criteria
 
 The MVP is complete only when all of these are true:
@@ -1238,6 +1249,7 @@ The MVP is complete only when all of these are true:
 - Internal notes are never exposed to customers.
 - CSV export is authorized and protected against formula injection.
 - Important mutations generate audit records.
+- Owner booking results support filters and pagination.
 - No real credentials, cards, or personal data are required.
 - No secrets are committed.
 - Lint, type-check, tests, and production builds pass locally and in CI.

@@ -28,7 +28,11 @@ The personal, non-commercial public portfolio needs a convincing demo, but local
 - Serverless runtime constraints may affect database connections, startup behavior, background work, and observability.
 - Deployment-domain choices affect authentication cookies, CORS, and CSRF configuration.
 
-## Validation gate
+## Current validation status
+
+The repository, local Docker workflow, deterministic seed data, isolated E2E environment, English portfolio assets, and clean-checkout setup have been validated. No Vercel or Supabase project has been created for ServiceOps, so this ADR remains provisional. Local seed credentials must not be reused in a deployed environment; an approved public demo requires separately provisioned, resettable fictional identities.
+
+## Remaining validation gate
 
 Before accepting this ADR permanently, deploy one approved vertical slice and verify:
 

@@ -30,4 +30,4 @@ The product must support Korean and English. Korean is initially the default, wh
 
 ## Validation
 
-The Phase 0C design spike must verify customer mobile layouts, owner desktop layouts, keyboard focus, responsive behavior, and representative Korean and English content.
+Phase 0C and the completed local MVP validated customer mobile layouts, owner desktop layouts, keyboard focus, responsive behavior, and representative Korean and English content. The shared foundations now support customer, staff, and owner surfaces, while automated checks cover axe, focus containment and restoration, reflow, forced colors, reduced motion, overflow, and representative touch-target geometry. Human screen-reader and physical-device review remain release gates.

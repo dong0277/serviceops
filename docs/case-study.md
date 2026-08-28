@@ -10,7 +10,7 @@ ServiceOps is a personal portfolio implementation of a focused replacement: one 
 
 The MVP needed to support customer, staff, and owner roles in Korean and English; generate bookable slots from weekly availability and time off; prevent overlapping active appointments; preserve customer privacy and internal notes; expose operational reports and CSV export; and remain reproducible on a developer laptop.
 
-The project deliberately uses fictional `.test` identities. It sells and fulfills no real services and accepts no payment. PostgreSQL and Docker Compose are the local baseline; external accounts and deployment remain explicit approval decisions, and the public portfolio target must remain free.
+The project deliberately uses fictional `.test` identities. It sells and fulfills no real services and accepts no payment. PostgreSQL and Docker Compose are the local baseline. The unvalidated public target is Vercel Hobby for the web and API plus Supabase Free for PostgreSQL; external projects and deployment still require explicit approval, and recurring cost must remain zero.
 
 ## Architecture choice
 
@@ -54,7 +54,7 @@ The screenshots are generated from deterministic fictional seed data with `make 
 
 Backend integration tests cover authentication, session rotation, CSRF, tenancy, role isolation, service operations, availability, cancellation and rescheduling, audit records, CSV sanitization, dashboard metrics, and near-concurrent booking attempts. Playwright covers the primary customer, staff, and owner journeys plus responsive English localization and authorization denial.
 
-Automated axe checks target WCAG 2.0/2.1 A and AA rules across representative routes. Keyboard tests cover focus trapping, Escape dismissal, and focus restoration. Additional coverage checks 200%-equivalent reflow, reduced-motion behavior, forced colors, and horizontal overflow. A human screen-reader review remains required before the release tag.
+Automated axe checks target WCAG 2.0/2.1 A and AA rules across representative routes. Keyboard tests cover focus trapping, Escape dismissal, and focus restoration. Additional coverage checks 200%-equivalent reflow, reduced-motion behavior, forced colors, horizontal overflow, and representative touch-target geometry. VoiceOver, a second screen-reader/browser combination, and physical-device ergonomics remain release gates.
 
 ## Security and privacy decisions
 
@@ -73,4 +73,4 @@ The MVP excludes payments, invoicing, payroll, accounting, chat, AI features, na
 
 ServiceOps now demonstrates a complete local workflow: deterministic setup, secure sessions, organization-scoped APIs, conflict-safe booking, responsive bilingual role surfaces, live operations reporting, auditability, and automated quality gates. A clean checkout has been verified independently of the original working directory.
 
-The next phase is a human assistive-technology review followed by an explicitly approved public deployment. Deployment must revalidate cookie, CORS, CSRF, and same-site behavior against the final domains and replace or supplement the process-local login limiter before multi-instance operation. After stable deployment screenshots and the acceptance checklist are confirmed, the repository can receive its first MVP release tag.
+The next phase is a human assistive-technology and physical-device review, plus a decision to implement owner-booking pagination or explicitly defer it. An approved public deployment must revalidate cookie, CORS, CSRF, and same-site behavior against the final domains and replace or supplement the process-local login limiter before multi-instance operation. After the zero-cost topology and acceptance checklist are confirmed, the repository can receive its first MVP release tag.

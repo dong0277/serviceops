@@ -65,6 +65,61 @@ Validates CSRF, revokes the server session, and deletes all session cookies. The
 
 Returns the active user and every organization membership available to that identity.
 
+## Representative local requests
+
+The examples below use only the fictional local seed identity. Start and seed the stack first with `make start` followed by `make seed`. Capture the customer session cookies:
+
+```bash
+curl -i \
+  -c /tmp/serviceops-customer-cookies.txt \
+  -H 'Content-Type: application/json' \
+  -H 'Origin: http://localhost:3000' \
+  --data '{"email":"customer.sora@serviceops.test","password":"ServiceOps-Demo-2026!"}' \
+  http://localhost:8000/api/v1/auth/login
+```
+
+Read the active services, then request slots using a returned service UUID and an inclusive date range:
+
+```bash
+curl http://localhost:8000/api/v1/organizations/demo-services/services
+
+curl --get \
+  --data-urlencode 'service_id=<service-uuid>' \
+  --data-urlencode 'date_from=2026-08-29' \
+  --data-urlencode 'date_to=2026-09-04' \
+  http://localhost:8000/api/v1/organizations/demo-services/slots
+```
+
+For a cookie-authenticated mutation, copy the CSRF cookie into the matching header. Use service, staff, and start values returned by the service and slot requests:
+
+```bash
+CSRF_TOKEN=$(awk '$6 == "serviceops_csrf" {print $7}' /tmp/serviceops-customer-cookies.txt)
+
+curl -i \
+  -b /tmp/serviceops-customer-cookies.txt \
+  -H 'Content-Type: application/json' \
+  -H 'Origin: http://localhost:3000' \
+  -H "X-CSRF-Token: ${CSRF_TOKEN}" \
+  --data '{"service_id":"<service-uuid>","staff_profile_id":"<staff-uuid>","starts_at":"<UTC-slot-start>"}' \
+  http://localhost:8000/api/v1/organizations/demo-services/bookings
+```
+
+Log in with `owner@serviceops.test` using a separate cookie jar to inspect filtered owner results. This read does not require a CSRF header:
+
+```bash
+curl -i \
+  -c /tmp/serviceops-owner-cookies.txt \
+  -H 'Content-Type: application/json' \
+  -H 'Origin: http://localhost:3000' \
+  --data '{"email":"owner@serviceops.test","password":"ServiceOps-Demo-2026!"}' \
+  http://localhost:8000/api/v1/auth/login
+
+curl -b /tmp/serviceops-owner-cookies.txt \
+  'http://localhost:8000/api/v1/organizations/demo-services/owner/bookings?status=requested'
+```
+
+Never reuse these local seed credentials or cookie files for an approved public deployment. The generated OpenAPI page remains the authority for complete request and response schemas.
+
 ## Organizations
 
 ### `GET /api/v1/organizations/{organization_slug}/members`
@@ -166,4 +221,4 @@ Booking, service, staff, assignment, status, cancellation, internal-note, and CS
 - `422 validation_error` — one or more request fields are invalid
 - `429 login_rate_limited` — failed-login window exceeded
 
-The error and validation envelopes are part of the API contract. Pagination and shared sorting conventions remain frontend-completion work.
+The error and validation envelopes are part of the API contract. Audit logs expose bounded `limit` and `offset` parameters, but owner booking results do not yet expose pagination and shared client-selectable sorting. That gap must be implemented or explicitly deferred before the MVP release tag.

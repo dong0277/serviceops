@@ -2,7 +2,7 @@
 
 ## Status and scope
 
-Milestones 3 and 4 implement password authentication, revocable browser sessions, CSRF protection, organization memberships, service and availability management, customer-owned booking operations, staff assigned-work transitions, owner operations, organization-scoped audit logging, and the complete responsive role surfaces. The Milestone 5 quality pass keeps browser tests isolated from the development database. Password reset and production deployment controls belong to later work.
+The local MVP implements password authentication, revocable browser sessions, CSRF protection, organization memberships, service and availability management, customer-owned booking operations, staff assigned-work transitions, owner operations, organization-scoped audit logging, and responsive role surfaces. Milestone 5 keeps browser tests and portfolio capture workflows isolated from the development database. Password reset remains outside the MVP, and deployment-specific controls have not been validated because no public environment exists yet.
 
 ## Authentication design
 
@@ -64,6 +64,6 @@ Remaining limitations:
 
 ## Local demo identities
 
-`make seed` is restricted to `development` and `test` environments. It creates fictional `.test` identities, three services, two staff profiles, weekly availability, time off, and mixed bookings using the local-only password `ServiceOps-Demo-2026!`. These credentials are intentionally public demo data and must never be enabled as production defaults.
+`make seed` is restricted to `development` and `test` environments. It creates fictional `.test` identities, three services, two staff profiles, weekly availability, time off, and mixed bookings using the local-only password `ServiceOps-Demo-2026!`. These credentials are intentionally documented local seed data and must never be enabled as deployment defaults. Any approved public demo must use separately provisioned, resettable fictional identities and a deployment-specific secret.
 
 `make e2e` creates a separate test Compose project and temporary PostgreSQL volume, then removes both after the run. Browser-created test users and records therefore never enter the normal development database.

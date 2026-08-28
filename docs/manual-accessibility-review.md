@@ -15,7 +15,7 @@ The first pass should use VoiceOver with Safari on macOS. The second pass must u
 
 ## Screen-reader scenarios
 
-Start the local stack with `make start`, open `http://localhost:3001/ko`, and use normal screen-reader navigation instead of the visual pointer whenever possible.
+Start the local stack with `make start`, open <http://localhost:3000/ko> using the default `WEB_PORT`, and use normal screen-reader navigation instead of the visual pointer whenever possible. If `WEB_PORT` is overridden in `.env`, use that port instead.
 
 | Surface          | Actions                                                                                                                         | Expected announcement and behavior                                                                                                                                                                     |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |

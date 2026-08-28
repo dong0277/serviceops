@@ -2,7 +2,7 @@
 
 ## Current scope
 
-ServiceOps targets WCAG 2.1 Level AA for the public booking, authentication, customer, staff, and owner surfaces. The Milestone 5 baseline combines automated checks with keyboard and responsive browser checks; it is not a substitute for a formal assistive-technology audit before public deployment.
+ServiceOps targets WCAG 2.1 Level AA for the public booking, authentication, customer, staff, and owner surfaces. The completed local Milestone 5 baseline combines automated checks with keyboard and responsive browser checks; it is not a substitute for a human assistive-technology review before public deployment.
 
 ## Implemented baseline
 
@@ -24,7 +24,7 @@ The command creates a temporary `serviceops-e2e` Docker Compose project with its
 E2E_WEB_PORT=13001 E2E_API_PORT=18001 E2E_POSTGRES_PORT=15433 make e2e
 ```
 
-## Remaining manual checks
+## Remaining release checks
 
 ### Environment-assisted review — 2026-08-28
 

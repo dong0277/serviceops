@@ -5,7 +5,7 @@
 
 ## Context
 
-ServiceOps requires relational modeling, transactions, booking conflict protection, organization isolation, deterministic tests, and a reproducible local environment. A likely public demo will use hosted PostgreSQL while FastAPI remains the business API.
+ServiceOps requires relational modeling, transactions, booking conflict protection, organization isolation, deterministic tests, and a reproducible local environment. The provisional zero-cost public target uses Supabase Free-hosted PostgreSQL while FastAPI remains the business API.
 
 Development takes place from two locations, so local database files or Docker volumes cannot be the source of truth.
 
@@ -19,7 +19,7 @@ Development takes place from two locations, so local database files or Docker vo
 - Store timestamps in UTC and store an IANA timezone per organization.
 - Make booking conflict checks and writes atomic using the PostgreSQL exclusion constraint documented in [ADR 006](006-booking-conflict-protection.md).
 - Treat migrations and deterministic seed data as portable development state. Do not synchronize or commit Docker volumes.
-- Supabase may later host PostgreSQL only; do not use Supabase Auth, generated APIs, or duplicated Edge Function business logic.
+- An approved public deployment may use Supabase Free for PostgreSQL only; do not use Supabase Auth, generated APIs, or duplicated Edge Function business logic.
 
 ## Consequences
 
