@@ -239,6 +239,40 @@ class OwnerCustomerResponse(BaseModel):
     last_booking_at: datetime | None
 
 
+class DashboardStatusMetric(BaseModel):
+    status: BookingStatus
+    count: int
+
+
+class DashboardServiceMetric(BaseModel):
+    service_id: uuid.UUID
+    service_name: str
+    count: int
+
+
+class DashboardStaffMetric(BaseModel):
+    staff_profile_id: uuid.UUID
+    staff_display_name: str
+    count: int
+
+
+class OwnerDashboardResponse(BaseModel):
+    timezone: str
+    today: date
+    period_days: int
+    period_start: date
+    period_end: date
+    today_booking_count: int
+    period_booking_count: int
+    completion_rate: float
+    cancellation_count: int
+    requested_count: int
+    status_counts: list[DashboardStatusMetric]
+    service_counts: list[DashboardServiceMetric]
+    staff_workload: list[DashboardStaffMetric]
+    today_schedule: list[OwnerBookingResponse]
+
+
 class AuditLogResponse(BaseModel):
     id: uuid.UUID
     actor_user_id: uuid.UUID | None

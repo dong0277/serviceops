@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  BarChart3,
   BookOpenCheck,
   CalendarDays,
   ChevronLeft,
@@ -10,7 +9,6 @@ import {
   FileClock,
   LayoutDashboard,
   Menu,
-  Settings,
   UsersRound,
   Wrench,
   X,
@@ -20,6 +18,7 @@ import {useState} from "react";
 import {BrandMark} from "@/components/brand-mark";
 import {LanguageSwitcher} from "@/components/language-switcher";
 import {Link, usePathname} from "@/i18n/navigation";
+import {useModalFocus} from "@/lib/use-modal-focus";
 
 const navItems = [
   {key: "overview", href: "/owner/dashboard", icon: LayoutDashboard},
@@ -35,6 +34,7 @@ export function OwnerShell({children}: {children: React.ReactNode}) {
   const t = useTranslations("Owner");
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+  const mobileNavigationRef = useModalFocus<HTMLElement>(mobileOpen, () => setMobileOpen(false));
 
   return (
     <div className="min-h-screen bg-canvas lg:grid lg:grid-cols-[248px_1fr]">
@@ -43,12 +43,12 @@ export function OwnerShell({children}: {children: React.ReactNode}) {
           <BrandMark inverse />
           <div>
             <p className="text-[0.95rem] font-bold tracking-[-0.02em]">ServiceOps</p>
-            <p className="mt-0.5 text-[0.68rem] text-white/50">{t("demoOrg")}</p>
+            <p className="mt-0.5 text-[0.68rem] text-white/75">{t("demoOrg")}</p>
           </div>
         </div>
         <div className="px-4 pt-5">
           <div className="mb-5 rounded-xl border border-white/8 bg-white/[0.055] p-3.5">
-            <p className="text-xs text-white/45">{t("workspaceLabel")}</p>
+            <p className="text-xs text-white/75">{t("workspaceLabel")}</p>
             <p className="mt-1 text-sm font-semibold">{t("workspace")}</p>
           </div>
           <nav aria-label={t("navigation")} className="space-y-1">
@@ -70,20 +70,13 @@ export function OwnerShell({children}: {children: React.ReactNode}) {
           </nav>
         </div>
         <div className="mt-auto border-t border-white/8 p-4">
-          <Link
-            href="/owner/settings"
-            className="mb-3 flex h-10 items-center gap-3 rounded-[0.65rem] px-3 text-sm text-white/62 hover:bg-white/8 hover:text-white"
-          >
-            <Settings className="size-[1.05rem]" aria-hidden="true" />
-            {t("settings")}
-          </Link>
           <div className="flex items-center gap-3 px-2">
             <span className="flex size-9 items-center justify-center rounded-full bg-[#d9a766] text-xs font-bold text-[#3c2812]">
               JY
             </span>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold">{t("admin")}</p>
-              <p className="truncate text-[0.68rem] text-white/45">owner@haesol.test</p>
+              <p className="truncate text-[0.68rem] text-white/75">owner@haesol.test</p>
             </div>
             <ChevronLeft className="size-4 text-white/35" aria-hidden="true" />
           </div>
@@ -110,17 +103,19 @@ export function OwnerShell({children}: {children: React.ReactNode}) {
           </div>
           <div className="ml-auto flex items-center gap-4">
             <LanguageSwitcher compact />
-            <button
-              type="button"
-              aria-label={t("notifications")}
+            <Link
+              href="/owner/audit"
+              aria-label={t("recentActivity")}
               className="relative flex size-9 items-center justify-center rounded-full bg-subtle text-muted"
             >
-              <BarChart3 className="size-4" />
-              <span className="absolute top-0.5 right-0.5 size-2 rounded-full bg-accent ring-2 ring-white" />
-            </button>
+              <FileClock className="size-4" />
+            </Link>
           </div>
         </header>
-        <main className="mx-auto w-full max-w-[1500px] px-4 py-7 sm:px-6 lg:px-8 lg:py-9">
+        <main
+          id="main-content"
+          className="mx-auto w-full max-w-[1500px] px-4 py-7 sm:px-6 lg:px-8 lg:py-9"
+        >
           {children}
         </main>
       </div>
@@ -131,9 +126,17 @@ export function OwnerShell({children}: {children: React.ReactNode}) {
             type="button"
             aria-label={t("closeOverlay")}
             onClick={() => setMobileOpen(false)}
+            tabIndex={-1}
             className="absolute inset-0 bg-black/35 backdrop-blur-[2px]"
           />
-          <aside className="relative flex h-full w-[min(86vw,320px)] flex-col bg-[#102a24] p-4 text-white shadow-2xl">
+          <aside
+            ref={mobileNavigationRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label={t("mobileNavigation")}
+            tabIndex={-1}
+            className="relative flex h-full w-[min(86vw,320px)] flex-col bg-[#102a24] p-4 text-white shadow-2xl"
+          >
             <div className="mb-6 flex items-center justify-between px-1">
               <div className="flex items-center gap-3">
                 <BrandMark inverse />
@@ -151,12 +154,14 @@ export function OwnerShell({children}: {children: React.ReactNode}) {
             <nav aria-label={t("mobileNavigation")} className="space-y-1">
               {navItems.map((item) => {
                 const Icon = item.icon;
+                const active = pathname.startsWith(item.href);
                 return (
                   <Link
                     key={item.key}
                     href={item.href}
                     onClick={() => setMobileOpen(false)}
-                    className="flex h-11 items-center gap-3 rounded-xl px-3 text-sm text-white/75 hover:bg-white/8 hover:text-white"
+                    aria-current={active ? "page" : undefined}
+                    className={`flex h-11 items-center gap-3 rounded-xl px-3 text-sm ${active ? "bg-white text-[#12382f]" : "text-white/75 hover:bg-white/8 hover:text-white"}`}
                   >
                     <Icon className="size-[1.05rem]" />
                     {t(item.key)}

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document records the historical Phase 0C spike that validated one thin design system across a comfortable mobile customer flow and a compact desktop operations flow. The spike originally used static fictional data. As of Milestone 2, the customer booking and owner booking-list screens use the real local API and PostgreSQL; the dashboard remains fictional presentation data.
+This document records the historical Phase 0C spike that validated one thin design system across a comfortable mobile customer flow and a compact desktop operations flow. The spike originally used static fictional data. As of Milestone 4, its customer, booking-list, and dashboard concepts have been connected to the local API and PostgreSQL; the seeded content remains fictional demo data.
 
 ## Screens
 

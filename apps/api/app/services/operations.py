@@ -1,16 +1,98 @@
 import csv
 import io
 import uuid
-from datetime import date
+from collections import Counter
+from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from sqlalchemy import and_, func, select
 from sqlalchemy.orm import Session
 
-from app.domain_schemas import OwnerCustomerResponse
+from app.domain_schemas import (
+    DashboardServiceMetric,
+    DashboardStaffMetric,
+    DashboardStatusMetric,
+    OwnerCustomerResponse,
+    OwnerDashboardResponse,
+)
 from app.models import Booking, BookingStatus, Membership, MembershipRole, User
 from app.services.audit import AuditAction, record_audit
-from app.services.bookings import find_owner_bookings
+from app.services.bookings import find_owner_bookings, to_owner_response
+
+
+def get_owner_dashboard(
+    db: Session,
+    organization_id: uuid.UUID,
+    timezone_name: str,
+    period_days: int,
+) -> OwnerDashboardResponse:
+    timezone = ZoneInfo(timezone_name)
+    today = datetime.now(timezone).date()
+    period_start = today - timedelta(days=period_days - 1)
+    period_bookings = find_owner_bookings(
+        db,
+        organization_id,
+        timezone_name,
+        date_from=period_start,
+        date_to=today,
+    )
+    today_schedule = sorted(
+        find_owner_bookings(
+            db,
+            organization_id,
+            timezone_name,
+            date_from=today,
+            date_to=today,
+        ),
+        key=lambda booking: (booking.starts_at, booking.id),
+    )
+
+    status_counts = Counter(booking.status for booking in period_bookings)
+    service_counts: Counter[tuple[uuid.UUID, str]] = Counter(
+        (booking.service.id, booking.service.name) for booking in period_bookings
+    )
+    staff_counts: Counter[tuple[uuid.UUID, str]] = Counter(
+        (booking.staff_profile.id, booking.staff_profile.display_name)
+        for booking in period_bookings
+        if booking.status != BookingStatus.CANCELLED
+    )
+    total = len(period_bookings)
+    completed = status_counts[BookingStatus.COMPLETED]
+
+    return OwnerDashboardResponse(
+        timezone=timezone_name,
+        today=today,
+        period_days=period_days,
+        period_start=period_start,
+        period_end=today,
+        today_booking_count=len(today_schedule),
+        period_booking_count=total,
+        completion_rate=round((completed / total) * 100, 1) if total else 0,
+        cancellation_count=status_counts[BookingStatus.CANCELLED],
+        requested_count=status_counts[BookingStatus.REQUESTED],
+        status_counts=[
+            DashboardStatusMetric(status=status, count=status_counts[status])
+            for status in BookingStatus
+        ],
+        service_counts=[
+            DashboardServiceMetric(service_id=service_id, service_name=name, count=count)
+            for (service_id, name), count in sorted(
+                service_counts.items(), key=lambda item: (-item[1], item[0][1], item[0][0])
+            )
+        ],
+        staff_workload=[
+            DashboardStaffMetric(
+                staff_profile_id=staff_profile_id,
+                staff_display_name=name,
+                count=count,
+            )
+            for (staff_profile_id, name), count in sorted(
+                staff_counts.items(), key=lambda item: (-item[1], item[0][1], item[0][0])
+            )
+        ],
+        today_schedule=[to_owner_response(booking) for booking in today_schedule],
+    )
+
 
 CSV_FORMULA_PREFIXES = ("=", "+", "-", "@", "\t", "\r")
 

@@ -31,6 +31,7 @@ import {
   type OwnerBookingRecord,
   type StaffProfileRecord,
 } from "@/lib/operations-types";
+import {useModalFocus} from "@/lib/use-modal-focus";
 
 type Status = BookingStatus;
 type BookingRecord = OwnerBookingRecord;
@@ -67,6 +68,9 @@ export function BookingList() {
   const [editStaffId, setEditStaffId] = useState("");
   const [editNote, setEditNote] = useState("");
   const [savingDetails, setSavingDetails] = useState(false);
+  const detailsDialogRef = useModalFocus<HTMLElement>(Boolean(selectedBooking), () => {
+    if (!savingDetails) setSelectedBooking(null);
+  });
 
   const loadBookings = useCallback(async () => {
     setLoading(true);
@@ -583,11 +587,14 @@ export function BookingList() {
             className="absolute inset-0 bg-black/35 backdrop-blur-[2px]"
             aria-label={t("closeDetails")}
             onClick={() => setSelectedBooking(null)}
+            tabIndex={-1}
           />
           <section
+            ref={detailsDialogRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="booking-details-title"
+            tabIndex={-1}
             className="relative z-10 w-full max-w-lg rounded-2xl border border-line bg-white p-5 shadow-2xl sm:p-6"
           >
             <div className="flex items-start justify-between gap-4">

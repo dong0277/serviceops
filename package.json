@@ -7,6 +7,7 @@
     "dev": "pnpm --filter @serviceops/web dev",
     "build": "pnpm --filter @serviceops/web build:webpack",
     "build:turbopack": "pnpm --filter @serviceops/web build",
+    "e2e": "pnpm --filter @serviceops/web e2e",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "pnpm --filter @serviceops/web lint && pnpm format:check",

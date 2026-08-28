@@ -8,7 +8,7 @@ def test_health_reports_liveness(client: TestClient) -> None:
     assert response.json() == {
         "status": "ok",
         "service": "serviceops-api",
-        "version": "0.4.0",
+        "version": "0.5.0",
     }
 
 
@@ -27,4 +27,4 @@ def test_openapi_is_versioned(client: TestClient) -> None:
 
     assert response.status_code == 200
     assert response.json()["info"]["title"] == "ServiceOps API"
-    assert response.json()["info"]["version"] == "0.4.0"
+    assert response.json()["info"]["version"] == "0.5.0"

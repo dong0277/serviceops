@@ -38,6 +38,34 @@ export type StaffProfileRecord = {
   service_ids: string[];
 };
 
+export type ServiceRecord = {
+  id: string;
+  name: string;
+  description: string;
+  duration_minutes: number;
+  price_display_cents: number | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type OwnerDashboardRecord = {
+  timezone: string;
+  today: string;
+  period_days: number;
+  period_start: string;
+  period_end: string;
+  today_booking_count: number;
+  period_booking_count: number;
+  completion_rate: number;
+  cancellation_count: number;
+  requested_count: number;
+  status_counts: {status: BookingStatus; count: number}[];
+  service_counts: {service_id: string; service_name: string; count: number}[];
+  staff_workload: {staff_profile_id: string; staff_display_name: string; count: number}[];
+  today_schedule: OwnerBookingRecord[];
+};
+
 export type CustomerRecord = {
   id: string;
   display_name: string;

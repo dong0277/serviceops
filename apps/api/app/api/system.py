@@ -12,7 +12,7 @@ router = APIRouter(tags=["system"])
 class HealthResponse(BaseModel):
     status: Literal["ok"] = "ok"
     service: str = "serviceops-api"
-    version: str = "0.4.0"
+    version: str = "0.5.0"
 
 
 class ReadinessChecks(BaseModel):

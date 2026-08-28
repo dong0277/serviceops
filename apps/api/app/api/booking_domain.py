@@ -21,6 +21,7 @@ from app.domain_schemas import (
     OwnerBookingResponse,
     OwnerBookingUpdate,
     OwnerCustomerResponse,
+    OwnerDashboardResponse,
     ServiceCreate,
     ServiceResponse,
     ServiceUpdate,
@@ -69,7 +70,11 @@ from app.services.catalog import (
     list_services,
     update_service,
 )
-from app.services.operations import export_owner_bookings_csv, list_owner_customers
+from app.services.operations import (
+    export_owner_bookings_csv,
+    get_owner_dashboard,
+    list_owner_customers,
+)
 from app.services.tenancy import OrganizationPrincipal
 
 router = APIRouter(prefix="/api/v1/organizations", tags=["booking domain"])
@@ -341,6 +346,23 @@ def owner_bookings(
         staff_profile_id=staff_profile_id,
         date_from=date_from,
         date_to=date_to,
+    )
+
+
+@router.get(
+    "/{organization_slug}/owner/dashboard",
+    response_model=OwnerDashboardResponse,
+)
+def owner_dashboard(
+    principal: OwnerPrincipal,
+    db: DatabaseSession,
+    period_days: Annotated[int, Query(ge=1, le=90)] = 7,
+) -> OwnerDashboardResponse:
+    return get_owner_dashboard(
+        db,
+        principal.organization.id,
+        principal.organization.timezone,
+        period_days,
     )
 
 

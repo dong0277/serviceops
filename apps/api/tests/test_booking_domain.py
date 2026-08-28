@@ -675,3 +675,92 @@ def test_owner_customer_view_csv_sanitization_and_audit_log(
     audits = client.get(f"{base}/audit-logs", params={"action": "csv_export_requested"})
     assert audits.status_code == 200
     assert audits.json()[0]["metadata_json"]["row_count"] >= 1
+
+
+def test_owner_dashboard_metrics_are_real_and_organization_scoped(
+    client: TestClient,
+    db: Session,
+    demo_organization: Organization,
+) -> None:
+    timezone = ZoneInfo("Asia/Seoul")
+    today = datetime.now(timezone).date()
+    starts_today = datetime.combine(today, time(10), timezone)
+    service, staff = create_domain(db, demo_organization, starts_at=starts_today)
+    customer = create_identity(
+        db,
+        demo_organization,
+        email="dashboard.customer@serviceops.test",
+        role=MembershipRole.CUSTOMER,
+        display_name="대시보드 고객",
+    )
+    create_identity(
+        db,
+        demo_organization,
+        email="dashboard.owner@serviceops.test",
+        role=MembershipRole.OWNER,
+    )
+    db.add_all(
+        [
+            Booking(
+                organization_id=demo_organization.id,
+                customer_user_id=customer.id,
+                staff_profile_id=staff.id,
+                service_id=service.id,
+                starts_at=starts_today,
+                ends_at=starts_today + timedelta(hours=1),
+                status=BookingStatus.REQUESTED,
+            ),
+            Booking(
+                organization_id=demo_organization.id,
+                customer_user_id=customer.id,
+                staff_profile_id=staff.id,
+                service_id=service.id,
+                starts_at=starts_today - timedelta(days=1),
+                ends_at=starts_today - timedelta(days=1) + timedelta(hours=1),
+                status=BookingStatus.COMPLETED,
+            ),
+            Booking(
+                organization_id=demo_organization.id,
+                customer_user_id=customer.id,
+                staff_profile_id=staff.id,
+                service_id=service.id,
+                starts_at=starts_today - timedelta(days=2),
+                ends_at=starts_today - timedelta(days=2) + timedelta(hours=1),
+                status=BookingStatus.CANCELLED,
+            ),
+        ]
+    )
+    db.commit()
+
+    login_for_writes(client, "dashboard.owner@serviceops.test")
+    path = f"/api/v1/organizations/{demo_organization.slug}/owner/dashboard"
+    response = client.get(path, params={"period_days": 7})
+    assert response.status_code == 200
+    dashboard = response.json()
+    assert dashboard["today"] == today.isoformat()
+    assert dashboard["period_start"] == (today - timedelta(days=6)).isoformat()
+    assert dashboard["today_booking_count"] == 1
+    assert dashboard["period_booking_count"] == 3
+    assert dashboard["completion_rate"] == 33.3
+    assert dashboard["cancellation_count"] == 1
+    assert dashboard["requested_count"] == 1
+    assert dashboard["today_schedule"][0]["customer_display_name"] == "대시보드 고객"
+    assert {item["status"]: item["count"] for item in dashboard["status_counts"]} == {
+        "requested": 1,
+        "confirmed": 0,
+        "in_progress": 0,
+        "completed": 1,
+        "cancelled": 1,
+    }
+    assert dashboard["service_counts"] == [
+        {
+            "service_id": str(service.id),
+            "service_name": service.name,
+            "count": 3,
+        }
+    ]
+    assert dashboard["staff_workload"][0]["count"] == 2
+
+    login_for_writes(client, "dashboard.customer@serviceops.test")
+    forbidden = client.get(path)
+    assert forbidden.status_code == 403

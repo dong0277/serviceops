@@ -23,7 +23,7 @@ Liveness check. A successful response means the API process can serve HTTP reque
 {
   "status": "ok",
   "service": "serviceops-api",
-  "version": "0.4.0"
+  "version": "0.5.0"
 }
 ```
 
@@ -118,6 +118,10 @@ The following routes require a customer membership in the path organization. Mut
 Create accepts `service_id`, `staff_profile_id`, timezone-aware `starts_at`, and optional `customer_note`. The server derives `ends_at` from the service duration. Rescheduling accepts a new `staff_profile_id` and timezone-aware `starts_at`. Only requested or confirmed bookings may be rescheduled or cancelled. Customer responses never contain `internal_note`.
 
 ## Owner bookings
+
+### `GET /api/v1/organizations/{organization_slug}/owner/dashboard`
+
+Requires an owner membership. The optional `period_days` query parameter accepts 1–90 days and defaults to 7. The inclusive period ends on the current date in the organization timezone. The response includes period and today counts, completion and cancellation metrics, counts by booking status and service, non-cancelled workload by staff member, and today's ordered schedule.
 
 ### `GET /api/v1/organizations/{organization_slug}/owner/bookings`
 

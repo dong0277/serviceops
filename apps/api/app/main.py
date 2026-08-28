@@ -26,7 +26,7 @@ def create_app(settings: Settings | None = None, database: Database | None = Non
     application = FastAPI(
         title="ServiceOps API",
         summary="Booking and operations API for small field-service teams.",
-        version="0.4.0",
+        version="0.5.0",
         docs_url="/docs",
         redoc_url=None,
         openapi_url="/api/v1/openapi.json",
