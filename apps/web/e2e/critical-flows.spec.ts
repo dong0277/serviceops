@@ -89,7 +89,7 @@ test.describe.serial("ServiceOps critical role flows", () => {
     await page.getByLabel("Service name").fill(serviceName);
     await page.getByLabel("Description").fill("Created by the deterministic E2E flow.");
     await page.getByLabel("Duration in minutes").fill("45");
-    await page.getByLabel("Displayed price (KRW)").fill("55000");
+    await page.getByLabel("Fictional demo price (KRW)").fill("55000");
     await page.getByRole("button", {name: "Save service"}).click();
     await expect(page.getByText("The service was created.")).toBeVisible();
     await expect(page.getByRole("heading", {name: serviceName})).toBeVisible();

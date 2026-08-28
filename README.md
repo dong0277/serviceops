@@ -1,6 +1,6 @@
 # ServiceOps
 
-ServiceOps is a web-based booking and operations platform for small field-service teams. It is being built as a production-quality public portfolio project: customers book available services, staff manage assigned work, and owners oversee schedules, people, reporting, and audit history from one organization-scoped system.
+ServiceOps is a personal, non-commercial portfolio demo of a web-based booking and operations platform for small field-service teams. It demonstrates customers requesting available services, staff managing assigned work, and owners overseeing schedules, people, reporting, and audit history in one organization-scoped system.
 
 > **Current status:** Milestone 4 is complete and Milestone 5 polish is underway. The responsive Korean/English customer, staff, and owner surfaces now include live dashboard metrics, a calendar-oriented booking view, service management, explicit interaction states, isolated Playwright flows, and an automated WCAG 2.1 AA accessibility baseline.
 
@@ -18,7 +18,7 @@ ServiceOps is a web-based booking and operations platform for small field-servic
 - API liveness: `/health`
 - API readiness: `/ready`
 
-All displayed names, email addresses, schedules, metrics, and prices are fictional demo data persisted by `make seed`. The displayed prices are non-billing information and no payment is collected.
+All displayed names, email addresses, schedules, metrics, and prices are fictional demo data persisted by `make seed`. No real services are sold or fulfilled, and no payment is accepted or collected.
 
 ## Product views
 
@@ -42,7 +42,7 @@ flowchart LR
     GitHub --> Containers[Container builds]
 ```
 
-The repository is a simple monorepo. A single Next.js application contains public, customer, staff, and owner surfaces. FastAPI remains the authority for authentication, authorization, tenancy, and booking rules. PostgreSQL runs locally through Docker Compose and may later use Supabase as a managed database only.
+The repository is a simple monorepo. A single Next.js application contains public, customer, staff, and owner surfaces. FastAPI remains the authority for authentication, authorization, tenancy, and booking rules. PostgreSQL runs locally through Docker Compose; the provisional zero-cost public-demo target uses Supabase Free as a managed database only.
 
 See [architecture notes](docs/architecture.md) and the [architecture decisions](docs/adr/) for details.
 
@@ -149,6 +149,7 @@ Makefile
 ## Security notes
 
 - No real customer, payment, or personal data is used.
+- The public site is a personal, non-commercial software demo; it does not advertise or fulfill real services.
 - Local ports bind to `127.0.0.1` by default.
 - Secrets belong in the ignored `.env` file; `.env.example` contains placeholders only.
 - Access and refresh credentials are opaque HttpOnly cookies; only their SHA-256 hashes are stored in PostgreSQL.

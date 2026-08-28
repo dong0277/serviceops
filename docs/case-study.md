@@ -1,16 +1,16 @@
 # ServiceOps case study
 
-## The client-style problem
+## Problem overview
 
 Small field-service teams often coordinate bookings through a mixture of phone calls, messages, personal calendars, and spreadsheets. Customers cannot see reliable availability, staff do not have one authoritative view of assigned work, and owners spend time reconciling status updates instead of managing service quality.
 
-ServiceOps is a portfolio implementation of a focused replacement: one organization-scoped system where customers request available times, staff advance assigned work through valid states, and owners manage the schedule, catalog, people, reporting, and audit history.
+ServiceOps is a personal portfolio implementation of a focused replacement: one organization-scoped system where customers request available times, staff advance assigned work through valid states, and owners manage the schedule, catalog, people, reporting, and audit history.
 
 ## Requirements and constraints
 
 The MVP needed to support customer, staff, and owner roles in Korean and English; generate bookable slots from weekly availability and time off; prevent overlapping active appointments; preserve customer privacy and internal notes; expose operational reports and CSV export; and remain reproducible on a developer laptop.
 
-The project deliberately uses fictional `.test` identities and collects no payment. PostgreSQL and Docker Compose are the local baseline. External accounts, paid infrastructure, and deployment remain explicit approval decisions rather than hidden prerequisites.
+The project deliberately uses fictional `.test` identities. It sells and fulfills no real services and accepts no payment. PostgreSQL and Docker Compose are the local baseline; external accounts and deployment remain explicit approval decisions, and the public portfolio target must remain free.
 
 ## Architecture choice
 
@@ -67,7 +67,7 @@ Automated axe checks target WCAG 2.0/2.1 A and AA rules across representative ro
 
 ## Deliberate exclusions
 
-The MVP excludes payments, invoicing, payroll, accounting, chat, AI features, native mobile apps, complex routing, recurring-booking automation, third-party OAuth, and SMS delivery. These features would add operational and compliance cost without improving the core portfolio story: reliable scheduling and role-aware service operations.
+The MVP excludes payments, invoicing, payroll, accounting, chat, AI features, native mobile apps, complex routing, recurring-booking automation, third-party OAuth, and SMS delivery. These features would add operational and compliance cost without improving the core engineering demonstration: reliable scheduling and role-aware service operations.
 
 ## Outcome and next phase
 

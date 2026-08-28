@@ -7,7 +7,7 @@ This document is the single working brief for building ServiceOps with ChatGPT C
 It combines:
 
 - The product and engineering requirements for ServiceOps
-- The portfolio and client-acquisition goal
+- The personal, non-commercial portfolio goal
 - The reusable one-person development process
 - The initial design-system strategy
 - The GitHub, deployment, and database strategy
@@ -25,17 +25,17 @@ Do not silently change a decision. Record proposed changes as an ADR and ask for
 
 # Part A. Strategy and Current Decisions
 
-## 1. Business Goal
+## 1. Project Goal
 
 ServiceOps is not only a demo application. It has two purposes.
 
-### Primary purpose: public developer reference
+### Primary purpose: personal public developer reference
 
-Create a credible, production-quality portfolio application that can be shown to prospective freelance clients. It should demonstrate that one developer can understand a business problem, design an appropriate workflow, implement the full stack, test it, document it, and deploy a convincing demo.
+Create a credible, production-quality personal portfolio application that demonstrates how one developer can understand a product problem, design an appropriate workflow, implement the full stack, test it, document it, and deploy a convincing non-commercial demo.
 
 ### Secondary purpose: reusable delivery process
 
-Use ServiceOps to establish a repeatable development process for future client projects. Future clients will have different requirements, branding, and workflows. The reusable assets should eventually include:
+Use ServiceOps to establish a repeatable development process for future personal or open-source projects. Future projects will have different requirements, branding, and workflows. The reusable assets should eventually include:
 
 - Repository and monorepo structure
 - GitHub issue and pull-request workflow
@@ -72,7 +72,7 @@ Required behavior:
 
 ## 3. Product Presentation Goal
 
-The final public demo should let a prospective client understand the product without reading the source code.
+The final public demo should let a portfolio visitor understand the product without reading the source code.
 
 The primary demo story is:
 
@@ -90,7 +90,7 @@ The final portfolio should include:
 - Architecture diagram
 - Security and tenancy explanation
 - Testing and CI evidence
-- A freelancer-style case study
+- A concise engineering case study
 - Clear non-goals and tradeoffs
 
 ## 4. Current Architecture Decisions
@@ -195,16 +195,18 @@ Docker Desktop and Docker Compose must be available in both work locations. Do n
 
 Local development and automated tests come first.
 
+User decision (2026-08-28): public deployment is for a personal, non-commercial portfolio and must have no recurring hosting cost. The deployed product must not advertise paid services, solicit freelance work, collect payment, or imply that fictional field services will be fulfilled.
+
 The likely public-demo deployment is:
 
 ```text
 GitHub monorepo
-├── Vercel project: apps/web
-├── Vercel project: apps/api
-└── Supabase project: PostgreSQL only
+├── Vercel Hobby project: apps/web
+├── Vercel Hobby project: apps/api
+└── Supabase Free project: PostgreSQL only
 ```
 
-This remains provisional until a working vertical slice is deployed. If Vercel Functions create a real technical problem for FastAPI, document the evidence in an ADR and propose a container host. Do not switch hosting providers silently.
+This remains provisional until a working vertical slice is deployed and the zero-cost limits are validated. Use the provider domains initially and do not purchase a custom domain. If Vercel Functions, free-tier terms, or database suspension create a real technical problem, document the evidence in an ADR and propose another zero-cost host. Do not switch hosting providers silently.
 
 Normal test and build workflows must not depend on production credentials.
 
@@ -410,7 +412,7 @@ A slice is not complete until:
 
 ### Milestone 2: domain correctness
 
-Prioritize the engineering qualities that make ServiceOps credible as a senior freelance reference:
+Prioritize the engineering qualities that make ServiceOps credible as a senior full-stack engineering reference:
 
 - Organization isolation
 - Role-based authorization
@@ -430,7 +432,7 @@ Add staff workflows and owner management only after the vertical slice and domai
 
 Complete customer, staff, and owner pages, operational patterns, responsive states, accessibility, and end-to-end tests.
 
-### Milestone 5: public portfolio and deployment
+### Milestone 5: personal public portfolio and deployment
 
 - Configure safe demo data and demo-role entry paths.
 - Deploy preview and production environments only with approval.
@@ -443,7 +445,7 @@ Complete customer, staff, and owner pages, operational patterns, responsive stat
 
 This is post-MVP work.
 
-After ServiceOps is stable, extract proven generic pieces into a separate client-project starter. Do not move ServiceOps-specific booking logic into the generic template.
+After ServiceOps is stable, extract proven generic pieces into a separate project starter. Do not move ServiceOps-specific booking logic into the generic template.
 
 Potential template contents:
 
@@ -519,11 +521,11 @@ The following baseline specification remains binding unless Part A explicitly su
 
 ## 1. Your Role
 
-Act as a senior full-stack engineer building a production-quality public portfolio project.
+Act as a senior full-stack engineer building a production-quality personal, non-commercial public portfolio project.
 
 Build **ServiceOps**, a web-based booking and operations platform for small field-service businesses such as cleaners, repair technicians, personal trainers, tutors, and beauty-service providers.
 
-The project must look credible to a client hiring an intermediate or senior freelancer. Prioritize a complete, testable, documented MVP over a large unfinished feature set.
+The project must serve as a credible intermediate-to-senior full-stack engineering reference. Prioritize a complete, testable, documented MVP over a large unfinished feature set.
 
 Work autonomously within this specification. If the repository is not empty, inspect it before changing anything and preserve useful existing work. Do not inspect or depend on any unrelated repositories.
 
@@ -1141,9 +1143,9 @@ Document implemented controls, assumptions, threat model, and known limitations.
 
 ### docs/case-study.md
 
-Write this like a concise freelancer case study:
+Write this like a concise engineering case study:
 
-- Client-style problem statement
+- Product problem statement
 - Requirements and constraints
 - Architecture choice
 - Difficult implementation problems
@@ -1213,11 +1215,13 @@ Progress record (2026-08-28): completed the first quality slice with an automate
 
 Clean-checkout record (2026-08-28): cloned public `origin/main` at `5f47a49` into a new temporary directory, installed locked JavaScript and Python dependencies, built the production Docker images, applied migrations, seeded fictional data, verified API health/readiness and Korean/English routes, signed in through a real browser, and exercised the owner dashboard, calendar, service, and booking surfaces. Lint, strict type checking, the production build, 21 backend tests, and 10 isolated Playwright accessibility/critical-flow tests passed. The check exposed that a customized `.env` `TEST_POSTGRES_PORT` reached Docker Compose but not the host pytest URL; `make test` now discovers Docker's actual published test-database port and stops the test container on success, interruption, or failure. Stable UI captures, case-study completion, manual assistive-technology review, deployment approval, and the release tag remain open.
 
-Portfolio progress record (2026-08-28): added a reproducible `make portfolio-captures` workflow that builds an isolated seeded Docker project, captures English customer, staff, dashboard, and calendar views, and removes its temporary database on exit. The generated portfolio images are linked from the README and the new concise freelancer-oriented `docs/case-study.md`. Visual review exposed and corrected a dashboard insight-card background conflict. Reduced-motion and forced-colors focus treatment plus 200%-equivalent reflow coverage were added and recorded in `docs/accessibility.md`. Human VoiceOver/additional screen-reader and physical touch-target review, deployment approval, and the release tag remain open.
+Portfolio progress record (2026-08-28): added a reproducible `make portfolio-captures` workflow that builds an isolated seeded Docker project, captures English customer, staff, dashboard, and calendar views, and removes its temporary database on exit. The generated portfolio images are linked from the README and the concise engineering-focused `docs/case-study.md`. Visual review exposed and corrected a dashboard insight-card background conflict. Reduced-motion and forced-colors focus treatment plus 200%-equivalent reflow coverage were added and recorded in `docs/accessibility.md`. Human VoiceOver/additional screen-reader and physical touch-target review, deployment approval, and the release tag remain open.
 
 Touch-target review record (2026-08-28): measured every visible interactive element across the full 390 × 844 customer booking, staff assigned-work, and owner dashboard pages. The shared language selector and four compact text links measured 16–20 CSS pixels high; their hit areas now measure 40–44 pixels. A Playwright regression guard rejects representative visible interactive targets smaller than 24 CSS pixels, and all 12 isolated accessibility and critical-flow tests pass. `docs/manual-accessibility-review.md` now provides route-by-route VoiceOver, second-screen-reader, physical-device, findings, and retest procedures. Human auditory review and physical-device ergonomics confirmation, deployment approval, and the release tag remain open.
 
 Demo capture record (2026-08-28): added a reproducible `make portfolio-demo` workflow that uses the isolated fictional seed environment to capture an English customer request, staff confirmation, owner dashboard, and booking calendar sequence. The optimized looping GIF is embedded in the README and case study; ImageMagick is the only additional local capture dependency. Human accessibility review, deployment approval, and the release tag remain open.
+
+Non-commercial portfolio review record (2026-08-28): confirmed that the repository contains no personal contact solicitation, hiring CTA, advertising, affiliate link, donation request, payment integration, or real card flow. Reframed the project and case study as a personal, non-commercial engineering portfolio; added an explicit fictional-data/no-sale/no-fulfillment/no-payment notice to every Korean and English route and to page metadata; removed wording that implied real visits, price inquiries, public production registration, client acquisition, or freelance solicitation; and recorded the zero-recurring-cost deployment constraint. All four portfolio screenshots and the eight-frame GIF were regenerated from English routes. Formatting, lint, strict type checking, the production build, and all 12 isolated accessibility and critical-flow browser tests pass.
 
 ## 23. Acceptance Criteria
 

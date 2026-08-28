@@ -86,7 +86,6 @@ export default async function PreviewHome() {
             );
           })}
         </section>
-        <p className="pb-6 text-center text-xs text-muted">{common("fictionalData")}</p>
       </div>
     </main>
   );
